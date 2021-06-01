@@ -1,4 +1,4 @@
-CS 176 Smart Alarm PWA
+# CS 176 Smart Alarm PWA
 
 > A project by JV Afable, Lance Lim, Gene Tan
 
