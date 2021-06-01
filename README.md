@@ -1,6 +1,6 @@
-# ZipInfo PWA
+CS 176 Smart Alarm PWA
 
-> Zipcode city finder PWA built with Vue.js and Ionic 4 using the @ionic/vue package and the @vue/pwa plugin
+> A project by JV Afable, Lance Lim, Gene Tan
 
 ## Project setup
 
