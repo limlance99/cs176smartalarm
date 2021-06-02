@@ -1,0 +1,54 @@
+// $font-family-ios-base:"Mulish" !important;
+// $font-family-md-base:"Mulish" !important;
+// $font-family-wp-base:"Mulish" !important;
+
+@font-face {
+    font-family: "Roboto";
+    font-display: "swap";
+    font-weight: 400;
+    font-style: normal;
+    src: url('./fonts/Roboto-Light.ttf');
+  }
+
+* {
+    font-family: "Roboto";
+}
+
+h1 {
+  font-size:91.55px !important;
+}
+
+h2 {
+  font-size:70.80px !important;
+}
+
+h3 {
+  font-size:56.64px !important;
+}
+
+h4 {
+  font-size:45.31px !important;
+}
+
+h5 {
+  font-size:36.25px !important;
+}
+
+h6 {
+  font-size: 29.00px !important;
+}
+
+p {
+  font-size: 23.20px !important;
+}
+
+.alert-message .no-margin {
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+.alert-message {
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+}
+// @import "@ionic/core/css/ionic.bundle.css";
