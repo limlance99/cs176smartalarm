@@ -13,10 +13,10 @@
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
-        <ion-tab tab="statistics">
+        <!-- <ion-tab tab="statistics">
           <Header :header="'Statistics'" />
           <Statistics />
-        </ion-tab>
+        </ion-tab> -->
 
         <ion-tab tab="settings">
           <Header :header="'Settings'" />
@@ -32,10 +32,10 @@
             <ion-label>Clock</ion-label>
             <ion-icon name="clock"></ion-icon>
           </ion-tab-button>
-          <ion-tab-button tab="statistics">
+          <!-- <ion-tab-button tab="statistics">
             <ion-label>Statistics</ion-label>
             <ion-icon name="stats"></ion-icon>
-          </ion-tab-button>
+          </ion-tab-button> -->
           <ion-tab-button tab="settings">
             <ion-label>Settings</ion-label>
             <ion-icon name="settings"></ion-icon>
@@ -49,14 +49,14 @@
 <script>
 import Clock from "./components/Clock.vue";
 import Alarms from "./components/Alarms.vue";
-import Statistics from "./components/Statistics.vue";
+// import Statistics from "./components/Statistics.vue";
 import Settings from "./components/Settings.vue";
 import Header from "./components/Header.vue";
 
 import { newQuestion } from "./utils";
 export default {
   name: "app",
-  components: { Header, Clock, Alarms, Statistics, Settings },
+  components: { Header, Clock, Alarms, /*Statistics,*/ Settings },
 
   data() {
     return {
