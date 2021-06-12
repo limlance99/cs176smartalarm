@@ -1,6 +1,6 @@
 {
-  "name": "zip-info-pwa",
-  "short_name": "ZipInfo",
+  "name": "Smart Alarm",
+  "short_name": "Smart Alarm",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",

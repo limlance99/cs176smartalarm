@@ -5,8 +5,8 @@
       <ion-content>
         <ion-tabs>
           <ion-tab tab="alarms">
-            <Header :header="'Alarms'" />
-            <Alarms />
+            <Header :header="'Alarms'"/>
+            <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne"/>
           </ion-tab>
 
           <ion-tab tab="clock">
@@ -21,7 +21,7 @@
 
           <ion-tab tab="settings">
             <Header :header="'Settings'" />
-            <Settings />
+            <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" />
           </ion-tab>
 
           <ion-tab-bar slot="bottom">
@@ -54,6 +54,8 @@ import Alarms from "./components/Alarms.vue"
 import Statistics from "./components/Statistics.vue"
 import Settings from "./components/Settings.vue"
 import Header from "./components/Header.vue"
+
+import {newQuestion} from "./utils";
 export default {
   name: "app",
   components: { Header, Clock, Alarms, Statistics, Settings },
@@ -66,19 +68,54 @@ export default {
       ampm: '',
       week: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-      math: {
-        question: "2 + 2 = ?",
-        answer: 4
-      },
+      math: {},
+      difficulties: ["Easy", "Medium", "Hard"],
+      currentDiff: "Easy",
+      listOfAlarms: [
+        {time: "05:30", ampm: "AM", isActive: true},
+        {time: "06:08", ampm: "PM", isActive: true},
+      ]
     }
   },
 
   created() {
     this.intervalid1 = setInterval(function(){
         this.updateTime();
+        this.checkAlarms();
     }.bind(this), 1000);
   },
   methods: {
+    toggleOne(key) {
+      this.listOfAlarms[key].isActive = !this.listOfAlarms[key].isActive;
+    },
+
+    checkAlarms() {
+      var length = this.listOfAlarms.length;
+      var cd = new Date();
+      var hour = cd.getHours();
+      var mins = this.zeroPadding(cd.getMinutes(), 2);
+      var amOrpm;
+
+      if (hour >= 12) {
+        amOrpm = "PM";
+        if (hour > 12) hour = this.zeroPadding(hour - 12,2);
+        else hour = this.zeroPadding(hour,2);
+      }
+      else {
+        amOrpm = "AM";
+        if (hour == 0) hour = 12;
+        else hour = this.zeroPadding(hour,2);
+      }
+      var time = `${hour}:${mins}`;
+      for (let i = 0; i < length; ++i) {
+        let item = this.listOfAlarms[i];
+        if (!item.isActive) continue;
+        if (item.time == time && item.ampm == amOrpm) {
+          this.toggleAlarm();
+          this.listOfAlarms[i].isActive = !this.listOfAlarms[i].isActive;
+          };
+      }
+    },
      updateTime() {
         var cd = new Date();
         
@@ -106,7 +143,11 @@ export default {
       }
       return this.zeroPadding(num,2);
     },
+    changeDiff(val) {
+      this.currentDiff = val;
+    },
     async toggleAlarm() {
+      this.math = await newQuestion[`${this.currentDiff}`]();
       return this.$ionic.alertController
         .create({
           message: `<p class="no-margin"> ${this.math.question} </p>`,
