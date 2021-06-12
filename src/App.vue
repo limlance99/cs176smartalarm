@@ -147,7 +147,7 @@ export default {
       this.currentDiff = val;
     },
     async toggleAlarm() {
-      this.math = await newQuestion[`${this.currentDiff}`]();
+      this.math = await newQuestion[this.currentDiff]();
       return this.$ionic.alertController
         .create({
           message: `<p class="no-margin"> ${this.math.question} </p>`,
