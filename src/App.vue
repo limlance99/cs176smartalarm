@@ -4,7 +4,7 @@
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" />
+          <Header :header="'Alarms'" :alarms="listOfAlarms"/>
           <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" />
         </ion-tab>
 
@@ -53,10 +53,14 @@ import Alarms from "./components/Alarms.vue";
 import Settings from "./components/Settings.vue";
 import Header from "./components/Header.vue";
 
+
 import { newQuestion } from "./utils";
+// import { ref } from "vue";
+
+
 export default {
   name: "app",
-  components: { Header, Clock, Alarms, /*Statistics,*/ Settings },
+  components: { Header, Clock, Alarms, /*Statistics,*/ Settings},
 
   data() {
     return {
