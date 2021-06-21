@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app" :class="[isMorning ? 'light' : 'dark']">
     <ion-app>
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :alarms="listOfAlarms"/>
-          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" />
+          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning"/>
+          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
-          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" />
+          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning"/>
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
@@ -19,17 +19,17 @@
         </ion-tab> -->
 
         <ion-tab tab="settings">
-          <Header :header="'Settings'" />
-          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" />
+          <Header :header="'Settings'" :isMorning="isMorning"/>
+          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
         </ion-tab>
 
-        <ion-tab-bar slot="bottom">
+        <ion-tab-bar slot="bottom" style="padding-top:5px; padding-bottom:5px" :color="[isMorning ? 'secondary' : 'primary']">
           <ion-tab-button tab="alarms">
-            <ion-label>Alarms</ion-label>
+            <!-- <ion-label>Alarms</ion-label> -->
             <ion-icon name="alarm"></ion-icon>
           </ion-tab-button>
           <ion-tab-button tab="clock">
-            <ion-label>Clock</ion-label>
+            <!-- <ion-label>Clock</ion-label> -->
             <ion-icon name="clock"></ion-icon>
           </ion-tab-button>
           <!-- <ion-tab-button tab="statistics">
@@ -37,7 +37,7 @@
             <ion-icon name="stats"></ion-icon>
           </ion-tab-button> -->
           <ion-tab-button tab="settings">
-            <ion-label>Settings</ion-label>
+            <!-- <ion-label>Settings</ion-label> -->
             <ion-icon name="settings"></ion-icon>
           </ion-tab-button>
         </ion-tab-bar>
@@ -55,15 +55,20 @@ import Header from "./components/Header.vue";
 
 
 import { newQuestion } from "./utils";
+
 // import { ref } from "vue";
 
 
 export default {
   name: "app",
   components: { Header, Clock, Alarms, /*Statistics,*/ Settings},
-
+  setup() {
+    return {
+    };
+  },
   data() {
     return {
+      isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
       date: "",
@@ -95,13 +100,14 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "05:30", ampm: "AM", isActive: true },
-        { time: "06:08", ampm: "PM", isActive: true },
+        { time: "05:30", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
+        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
       ],
     };
   },
 
   created() {
+    this.updateTime();
     this.intervalid1 = setInterval(
       function () {
         this.updateTime();
@@ -109,6 +115,11 @@ export default {
       }.bind(this),
       1000
     );
+  },
+
+  watch: {
+    ampm() {
+    }
   },
   methods: {
     toggleOne(key) {
@@ -174,6 +185,7 @@ export default {
       if (num == 0) {
         return 12;
       }
+      this.isMorning = num > 7 && num < 17;
       return this.zeroPadding(num, 2);
     },
     changeDiff(val) {
@@ -224,4 +236,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

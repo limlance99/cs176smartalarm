@@ -1,5 +1,5 @@
 <template>
-  <ion-content class="ion-padding">
+  <ion-content fullscreen class="ion-padding">
     <ion-list>
       <ion-list-header>
         <ion-label> Settings </ion-label>

@@ -1,11 +1,11 @@
 <template>
     <ion-header no-border>
-        <ion-toolbar mode="ios">
+        <ion-toolbar mode="ios" style="height:67.2px" class="vertical-align-content">
             <ion-title>
-                <h6> {{header}} </h6>
+                <h6 class="headerText"> {{header}} </h6>
             </ion-title>
 
-            <ion-button color="primary" fill="clear" v-if="header=='Alarms'" slot="end" style="margin-right:10px; font-size:24px; font-weight:100" @click="openModal">
+            <ion-button no-padding :color="[isMorning ? 'secondary' : 'primary']" fill="clear" v-if="header=='Alarms'" slot="end" style="margin-right:10px; font-size:24px; font-weight:100" @click="openModal">
                 <ion-icon name="add">
                 </ion-icon>
             </ion-button>
@@ -20,19 +20,40 @@
 import AddAlarm from './AddAlarm.vue';
 
 export default {
-    props: ["header", "alarms"],
+    props: ["header", "alarms", "isMorning"],
     methods: {
         async openModal() {
             const modal = await this.$ionic.modalController
                 .create({
                 component: AddAlarm,
                 componentProps: {
+                    propsData: {
+                        isMorning: this.isMorning
+                    }
                 },
                 });
             await modal.present();
             const { data } = await modal.onWillDismiss();
+            if (data == null) {
+                return;
+            }
             this.alarms.push(data);
+            this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1)
         },
+        convertTime12to24(data) {
+            let {time, ampm} = data;
+            let [hours, minutes] = time.split(':');
+
+            if (hours === '12') {
+                hours = '00';
+            }
+
+            if (ampm === 'PM') {
+                hours = parseInt(hours, 10) + 12;
+            }
+
+            return `${hours}:${minutes}`;
+            }
     }
 }
 </script>
