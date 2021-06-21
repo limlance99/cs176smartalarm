@@ -3,9 +3,9 @@
     <div class="xc fullheight">
         <div>
             <ion-card-content text-center>
-                <h4> {{ampm}} </h4>
-                <h1> {{time.substring(0,2)}} <blink>:</blink> {{time.substring(3,5)}} </h1>
-                <p> {{date}} </p>
+                <h4 class="regularText"> {{ampm}} </h4>
+                <h1 class="regularText"> {{time.substring(0,2)}} <blink>:</blink> {{time.substring(3,5)}} </h1>
+                <p class="regularText"> {{date}} </p>
             </ion-card-content>
         </div>
     </div>

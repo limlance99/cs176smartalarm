@@ -8,6 +8,10 @@ import "./assets/index.scss";
 // import VueScrollPicker from "vue-scroll-picker"
 
 // Vue.use(VueScrollPicker)
+
+// import SmoothPicker from 'vue-smooth-picker'
+// import 'vue-smooth-picker/dist/css/style.css'
+// Vue.use(SmoothPicker)
 Vue.use(Ionic);
 Vue.config.productionTip = false;
 

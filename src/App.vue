@@ -25,11 +25,11 @@
 
         <ion-tab-bar slot="bottom">
           <ion-tab-button tab="alarms">
-            <ion-label>Alarms</ion-label>
+            <!-- <ion-label>Alarms</ion-label> -->
             <ion-icon name="alarm"></ion-icon>
           </ion-tab-button>
           <ion-tab-button tab="clock">
-            <ion-label>Clock</ion-label>
+            <!-- <ion-label>Clock</ion-label> -->
             <ion-icon name="clock"></ion-icon>
           </ion-tab-button>
           <!-- <ion-tab-button tab="statistics">
@@ -37,7 +37,7 @@
             <ion-icon name="stats"></ion-icon>
           </ion-tab-button> -->
           <ion-tab-button tab="settings">
-            <ion-label>Settings</ion-label>
+            <!-- <ion-label>Settings</ion-label> -->
             <ion-icon name="settings"></ion-icon>
           </ion-tab-button>
         </ion-tab-bar>
@@ -55,13 +55,17 @@ import Header from "./components/Header.vue";
 
 
 import { newQuestion } from "./utils";
+
 // import { ref } from "vue";
 
 
 export default {
   name: "app",
   components: { Header, Clock, Alarms, /*Statistics,*/ Settings},
-
+  setup() {
+    return {
+    };
+  },
   data() {
     return {
       toolbarHeader: "Alarms",
@@ -95,8 +99,8 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "05:30", ampm: "AM", isActive: true },
-        { time: "06:08", ampm: "PM", isActive: true },
+        { time: "05:30", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
+        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
       ],
     };
   },
