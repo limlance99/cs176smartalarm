@@ -5,18 +5,18 @@
               
           <!-- <ion-toolbar mode="ios"> -->
           <ion-row>
-            <ion-col size="auto"> 
-              <ion-button color="primary" fill="clear" style="padding:0" @click="exitModal">
+            <ion-col size="auto" class="vertical-align-content"> 
+              <ion-button :color="[isMorning ? 'secondary' : 'primary']" fill="clear" style="padding:0" @click="exitModal">
                 Back
               </ion-button>
             </ion-col>
-            <ion-col>
-              <ion-title style="padding-left:10px; padding-right:10px; margin-top:0">
-                  <h6 class="headerText"> Add Alarm </h6>
+            <ion-col class="vertical-align-content">
+              <ion-title style="padding-left:10px">
+                  <h6 class="headerText ion-text-center" style="margin:0"> Add Alarm </h6>
               </ion-title>
             </ion-col>
-            <ion-col size="auto"> 
-              <ion-button color="primary" fill="clear" style="padding:0" @click="closeModal">
+            <ion-col size="auto" class="vertical-align-content"> 
+              <ion-button :color="[isMorning ? 'secondary' : 'primary']" fill="clear" style="padding:0;" @click="closeModal">
                   Done
               </ion-button>
             </ion-col>
@@ -31,7 +31,7 @@
            </ion-toolbar>
         </ion-header> -->
 
-        <ion-item style="margin-top:10px" class="regularText" lines="none">
+        <ion-item style="margin-top:10px; padding-left:10px; padding-right:10px" class="regularText" lines="none">
             <ion-label> Alarm Time </ion-label>
             <ion-datetime ref="ion-datetime" mode="ios" display-format="h:mm A" placeholder="Enter Time" value="2016-09-18T12:00:02.666Z" @ionChange="wibba = getHoursMins($event.target.value);">
             </ion-datetime>
@@ -39,7 +39,7 @@
 
         <ion-row style="margin-top:10px">
           <ion-col size="1.7" v-for="(w,index) in repetitions" :key="index" style="padding:2px;">
-            <ion-button @click="w.isActive = !w.isActive" :color="[w.isActive ? 'primary' : 'light']" :fill="[w.isActive ? 'solid' : 'clear']" style="max-width:30px; max-height: 33px"> {{w.day}} </ion-button>
+            <ion-button @click="w.isActive = !w.isActive" :color="[w.isActive ? isMorning ? 'secondary':'primary' : 'light']" :fill="[w.isActive ? 'solid' : 'clear']" style="max-width:30px; max-height: 33px"> {{w.day}} </ion-button>
           </ion-col>
         </ion-row>
 
@@ -63,6 +63,7 @@
 // import { IonDatetime, IonItem, IonLabel } from "@ionic/vue";
 export default {
   name: 'AddAlarm',
+  props: ["isMorning"],
   data() {
       return {
         wibba : '08:00 PM',
@@ -109,17 +110,6 @@ export default {
   },
 
   methods : {
-        test() {
-          console.log("MOUNTED")
-          console.log(this.$refs['ion-datetime']);
-          const dateTimeController = this.$refs['ion-datetime'];
-          var event = document.createEvent("MouseEvents");
-          event.initMouseEvent("click", true, true, window,
-              0, 0, 0, 0, 0,
-              false, false, false, false,
-              0, null);
-          var cancelled = !dateTimeController.dispatchEvent(event);
-        },
         getHoursMins (datetime) {
         let d = datetime.split('T')[1];
         let m = d.split(':')[0];

@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app" :class="[isMorning ? 'light' : 'dark']">
     <ion-app>
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :alarms="listOfAlarms"/>
-          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" />
+          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning"/>
+          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
-          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" />
+          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning"/>
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
@@ -19,11 +19,11 @@
         </ion-tab> -->
 
         <ion-tab tab="settings">
-          <Header :header="'Settings'" />
-          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" />
+          <Header :header="'Settings'" :isMorning="isMorning"/>
+          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
         </ion-tab>
 
-        <ion-tab-bar slot="bottom">
+        <ion-tab-bar slot="bottom" style="padding-top:5px; padding-bottom:5px" :color="[isMorning ? 'secondary' : 'primary']">
           <ion-tab-button tab="alarms">
             <!-- <ion-label>Alarms</ion-label> -->
             <ion-icon name="alarm"></ion-icon>
@@ -68,6 +68,7 @@ export default {
   },
   data() {
     return {
+      isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
       date: "",
@@ -106,6 +107,7 @@ export default {
   },
 
   created() {
+    this.updateTime();
     this.intervalid1 = setInterval(
       function () {
         this.updateTime();
@@ -113,6 +115,11 @@ export default {
       }.bind(this),
       1000
     );
+  },
+
+  watch: {
+    ampm() {
+    }
   },
   methods: {
     toggleOne(key) {
@@ -178,6 +185,7 @@ export default {
       if (num == 0) {
         return 12;
       }
+      this.isMorning = num > 7 && num < 17;
       return this.zeroPadding(num, 2);
     },
     changeDiff(val) {
