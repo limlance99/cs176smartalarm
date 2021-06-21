@@ -40,7 +40,7 @@ export default {
         var AmOrPm = m >= 12 ? 'PM' : 'AM';
         m = (m % 12) || 12;
 
-        let digit = m >= 12 ? 0 : 1;
+        let digit = m >= 10 ? 0 : 1;
         var zero = "";
         for (var i = 0; i < digit; i++) {
             zero += "0";
