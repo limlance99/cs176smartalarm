@@ -1,5 +1,5 @@
 <template>
-    <ion-content>
+    <ion-content fullscreen>
     <div class="xc fullheight">
         <div>
             <ion-card-content text-center>
@@ -9,7 +9,7 @@
             </ion-card-content>
         </div>
     </div>
-</ion-content>
+  </ion-content>
 </template>
 
 <script>
