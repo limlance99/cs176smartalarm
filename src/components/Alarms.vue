@@ -47,7 +47,7 @@ export default {
                   text: 'Cancel',
                   role: 'cancel',
                   handler: () => {
-                    console.log('Cancel clicked')
+                    // console.log('Cancel clicked')
                   },
                 },
               ],
@@ -55,7 +55,7 @@ export default {
           await actionSheet.present();
 
           const { role } = await actionSheet.onDidDismiss();
-          console.log('onDidDismiss resolved with role', role);
+          // console.log('onDidDismiss resolved with role', role);
         },
     }
 }

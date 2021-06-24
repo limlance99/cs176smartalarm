@@ -13,10 +13,10 @@
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
-        <!-- <ion-tab tab="statistics">
+        <ion-tab tab="statistics">
           <Header :header="'Statistics'" />
           <Statistics />
-        </ion-tab> -->
+        </ion-tab>
 
         <ion-tab tab="settings">
           <Header :header="'Settings'" :isMorning="isMorning"/>
@@ -32,10 +32,10 @@
             <!-- <ion-label>Clock</ion-label> -->
             <ion-icon name="clock"></ion-icon>
           </ion-tab-button>
-          <!-- <ion-tab-button tab="statistics">
+          <ion-tab-button tab="statistics">
             <ion-label>Statistics</ion-label>
             <ion-icon name="stats"></ion-icon>
-          </ion-tab-button> -->
+          </ion-tab-button>
           <ion-tab-button tab="settings">
             <!-- <ion-label>Settings</ion-label> -->
             <ion-icon name="settings"></ion-icon>
@@ -49,7 +49,7 @@
 <script>
 import Clock from "./components/Clock.vue";
 import Alarms from "./components/Alarms.vue";
-// import Statistics from "./components/Statistics.vue";
+import Statistics from "./components/Statistics.vue";
 import Settings from "./components/Settings.vue";
 import Header from "./components/Header.vue";
 
@@ -61,7 +61,7 @@ import { newQuestion } from "./utils";
 
 export default {
   name: "app",
-  components: { Header, Clock, Alarms, /*Statistics,*/ Settings},
+  components: { Header, Clock, Alarms, Statistics, Settings},
   setup() {
     return {
     };
@@ -103,20 +103,29 @@ export default {
         { time: "05:30", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
         { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
       ],
+      hiddenAlarms: [],
     };
   },
 
   created() {
     this.updateTime();
+    // this.intervalid1 = setInterval(
+    //   function () {
+    //     this.updateTime();
+    //     this.checkAlarms();
+    //   }.bind(this),
+    //   10000,
+    // );
+  },
+  mounted() {
     this.intervalid1 = setInterval(
       function () {
         this.updateTime();
         this.checkAlarms();
       }.bind(this),
-      1000
+      1000,
     );
   },
-
   watch: {
     ampm() {
     }
@@ -143,14 +152,43 @@ export default {
         else hour = this.zeroPadding(hour, 2);
       }
       var time = `${hour}:${mins}`;
+      // console.log(this.listOfAlarms);
       for (let i = 0; i < length; ++i) {
         let item = this.listOfAlarms[i];
         if (!item.isActive) continue;
         if (item.time == time && item.ampm == amOrpm) {
-          this.toggleAlarm();
-          this.listOfAlarms[i].isActive = !this.listOfAlarms[i].isActive;
+          // console.log('alarms were checked');
+          // console.log(this.listOfAlarms[i].isActive);
+          // this.listOfAlarms[i].isActive = !this.listOfAlarms[i].isActive;
+          this.$set(this.listOfAlarms[i], "isActive", !this.listOfAlarms[i].isActive);
+          // console.log(this.listOfAlarms[i].isActive);
+          this.toggleAlarm(item);
         }
       }
+
+      var hiddenLength = this.hiddenAlarms.length;
+      for (let i = 0; i < hiddenLength; ++i) {
+        let item = this.hiddenAlarms[i];
+        if (!item.isActive) continue;
+        if (item.time == time && item.ampm == amOrpm) {
+          this.toggleAlarm(item);
+          // this.hiddenAlarms.splice(i, 1);
+          this.hiddenAlarms[i].isActive = !this.hiddenAlarms[i].isActive;
+        }
+      }
+
+
+      // Remove inactive hidden alarms
+      var newList = [];
+      for (let i = 0; i < hiddenLength; ++i) {
+        if (this.hiddenAlarms[i].isActive)
+          newList.push(this.hiddenAlarms[i]);
+      }
+      this.hiddenAlarms = [];
+      for (let i = 0; i < newList.length; ++i) {
+        this.hiddenAlarms.push(newList[i]);
+      }
+
     },
     updateTime() {
       var cd = new Date();
@@ -191,7 +229,7 @@ export default {
     changeDiff(val) {
       this.currentDiff = val;
     },
-    async toggleAlarm() {
+    async toggleAlarm(alarmTime) {
       this.math = await newQuestion[this.currentDiff]();
       return this.$ionic.alertController
         .create({
@@ -213,6 +251,7 @@ export default {
                   this.showErrorToast("Wrong answer");
                   return false;
                 }
+                this.showWakeupOptions(alarmTime);
                 return true;
               },
             },
@@ -230,6 +269,62 @@ export default {
         color: "danger",
       });
       await toast.present();
+    },
+    async showWakeupOptions(alarmTime) {
+      return this.$ionic.alertController
+        .create({
+          message: `<p class="no-margin"> Snooze or Stop Alarm </p>`,
+          mode: "ios",
+          buttons: [
+            {
+              text: "Snooze",
+              handler: (data) => {
+                var hours = parseInt(alarmTime.time.split(':')[0]);
+                var mins = parseInt(alarmTime.time.split(':')[1]) + 1;
+                var ampm = alarmTime.ampm;
+
+                if (mins >= 60) {
+                  mins = mins % 60;
+                  hours = hours + 1;
+                }
+
+                if (hours >= 12) {
+                  hours = hours - 12;
+                  ampm = (ampm == "PM") ? "AM" : "PM";
+                }
+
+                if (hours < 10) {
+                  hours = '0' + hours;
+                }
+
+                if (mins < 10) {
+                  mins = '0' + mins;
+                }
+
+                var fullTime = hours + ':' + mins;
+                var newHiddenAlarm = {
+                  time : fullTime,
+                  ampm : ampm,
+                  isActive : true,
+                };
+
+                this.hiddenAlarms.push(
+                  newHiddenAlarm
+                );
+                console.log(this.hiddenAlarms);
+                return true;
+              },
+            },
+            {
+              text: "Stop Alarm",
+              handler: (data) => {
+                return true;
+              },
+            },
+          ],
+          backdropDismiss: false,
+        })
+        .then((a) => a.present());
     },
   },
 };
