@@ -4,22 +4,22 @@
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms"/>
+          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
           <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
-          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning" @getAlarms="getAlarms"/>
+          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
         <ion-tab tab="statistics">
-          <Header :header="'Statistics'" @getAlarms="getAlarms"/>
+          <Header :header="'Statistics'" @getAlarms="getAlarms" :userID="userID"/>
           <Statistics />
         </ion-tab>
 
         <ion-tab tab="settings">
-          <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms"/>
+          <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
           <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
         </ion-tab>
 
@@ -105,11 +105,8 @@ export default {
         { time: "06:08", ampm: "PM", isActive: true, repetitions: ['S'] },
       ],
       hiddenAlarms: [],
-      deferredPrompt: null
+      deferredPrompt: null,
     };
-  },
-  mounted() {
-    console.log(process.env.VUE_APP_ROOT_URL);
   },
   created() {
     this.updateTime();
@@ -140,6 +137,8 @@ export default {
       this.deferredPrompt = null;
       // Optionally, send analytics event to indicate successful install
       alert('PWA was installed');
+      this.createUser();
+
     });
   },
   mounted() {
@@ -156,9 +155,22 @@ export default {
     }
   },
   methods: {
+    createUser() {
+      console.log('CREATING USER');
+      axios.get(`${SERVER_URL}/adduser`)
+      .then(response => {
+        console.log(response);
+        if (response.status == 200) {
+          alert('created new user with ID:', response.data.id);
+          this.userID = response.data.id;
+          console.log(this.userID, response.data.id);
+          this.getAlarms();
+        }
+      });
+    },
     getAlarms() {
       console.log("HOY");
-      axios.get(`${SERVER_URL}/getalarms/16`)
+      axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
       .then(response => {
         console.log(response);
         this.listOfAlarms = response.data;

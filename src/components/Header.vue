@@ -21,7 +21,7 @@ import AddAlarm from './AddAlarm.vue';
 import { SERVER_URL } from "../../config.js"
 import axios from "axios"
 export default {
-    props: ["header", "alarms", "isMorning"],
+    props: ["header", "alarms", "isMorning", "userID"],
     methods: {
         async openModal() {
             const modal = await this.$ionic.modalController
@@ -42,7 +42,7 @@ export default {
             console.log(data);
             this.alarms.push(data);
             this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1);
-            axios.post(`${SERVER_URL}/addalarm/16/`, {alarm: data})
+            axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
             .then(response => {
                 console.log(response);
                 if (response.status == 200){

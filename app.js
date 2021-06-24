@@ -117,7 +117,7 @@ app.get('/adduser', (req, res) => {
         if (err) {
             throw err;
         }
-        res.send('user added' + result.insertId);
+        res.send({id: result.insertId});
         console.log('user added');
         let sql2 = 'INSERT INTO settings SET ?'
         let post2 = {userID: result.insertId, difficulty: 0, mode: 0}
