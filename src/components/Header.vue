@@ -39,13 +39,14 @@ export default {
             }
             
             console.log(data);
+            this.alarms.push(data);
+            this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1);
             axios.post(`http://localhost:3000/addalarm/16/`, {alarm: data})
             .then(response => {
                 console.log(response);
                 if (response.status == 200){
                     console.log(this.alarms);
-                    this.alarms.push(data);
-                    this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1);
+                    
                 }
             });
             

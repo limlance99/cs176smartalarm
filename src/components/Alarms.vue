@@ -45,11 +45,12 @@ export default {
                   role: 'destructive',
                   handler: () => {
                     console.log(this.alarms[key].id);
+                    this.alarms.splice(key, 1);
                     axios.get(`http://localhost:3000/deletealarm/${this.alarms[key].id}`)
                     .then(response => {
                       console.log(response);
                       if (response.status == 200) {
-                        this.alarms.splice(key, 1);
+                        //
                       }
                     });
                     
