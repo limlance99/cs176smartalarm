@@ -130,6 +130,12 @@ export default {
       async closeModal() {
         let t = this.wibba.split(' ')[0];
         let ap = this.wibba.split(' ')[1];
+        let repeats = []
+        for (var i of this.repetitions) {
+          if (i.isActive) {
+            repeats.push(i.day);
+          }
+        }
         let thing = { time: t, ampm: ap, isActive: true, repetitions: this.repetitions};
 
         const modal = await this.$ionic.modalController;

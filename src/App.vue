@@ -5,7 +5,7 @@
       <ion-tabs>
         <ion-tab tab="alarms">
           <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning"/>
-          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" :isMorning="isMorning"/>
+          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
@@ -55,9 +55,8 @@ import Header from "./components/Header.vue";
 
 
 import { newQuestion } from "./utils";
-
+import axios from 'axios';
 // import { ref } from "vue";
-
 
 export default {
   name: "app",
@@ -68,6 +67,7 @@ export default {
   },
   data() {
     return {
+      userID: 16,
       isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
@@ -100,15 +100,17 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "05:30", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
-        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
+        { time: "05:30", ampm: "AM", isActive: true, repetitions: ['M', 'T', 'W'] },
+        { time: "06:08", ampm: "PM", isActive: true, repetitions: ['S'] },
       ],
       hiddenAlarms: [],
     };
   },
-
+  mounted() {
+  },
   created() {
     this.updateTime();
+    this.getAlarms();
     // this.intervalid1 = setInterval(
     //   function () {
     //     this.updateTime();
@@ -116,6 +118,16 @@ export default {
     //   }.bind(this),
     //   10000,
     // );
+    window.addEventListener('beforeinstallprompt', (e) => {
+      alert("beforeinstallprompt");
+
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Update UI notify the user they can install the PWA
+      showInstallPromotion();
+    });
   },
   mounted() {
     this.intervalid1 = setInterval(
@@ -131,8 +143,25 @@ export default {
     }
   },
   methods: {
+    getAlarms() {
+      console.log("HOY");
+      axios.get("http://localhost:3000/getalarms/16")
+      .then(response => {
+        console.log(response);
+        this.listOfAlarms = response.data;
+        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
+      });
+    },
     toggleOne(key) {
-      this.listOfAlarms[key].isActive = !this.listOfAlarms[key].isActive;
+      console.log('TOGGLE', this.listOfAlarms[key], this.listOfAlarms[key].id);
+      this.listOfAlarms[key].isActive = this.listOfAlarms[key].isActive == 1 ? 0 : 1;
+      axios.post(`http://localhost:3000/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
+      .then(response => {
+          console.log(response);
+          if (response.status == 200){
+              // console.log(this.listOfAlarms);
+          }
+      });
     },
 
     checkAlarms() {
@@ -192,7 +221,7 @@ export default {
     },
     updateTime() {
       var cd = new Date();
-
+      this.isMorning = cd.getHours() > 7 && cd.getHours() < 17;
       this.time =
         this.formatHour(cd.getHours()) +
         ":" +
