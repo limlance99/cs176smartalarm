@@ -18,6 +18,7 @@
 // import { IonButton, IonContent, IonPage, modalController } from '@ionic/vue';
 // import modalController from '@ionic/vue';
 import AddAlarm from './AddAlarm.vue';
+import { SERVER_URL } from "../../config.js"
 import axios from "axios"
 export default {
     props: ["header", "alarms", "isMorning"],
@@ -41,11 +42,12 @@ export default {
             console.log(data);
             this.alarms.push(data);
             this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1);
-            axios.post(`http://localhost:3000/addalarm/16/`, {alarm: data})
+            axios.post(`${SERVER_URL}/addalarm/16/`, {alarm: data})
             .then(response => {
                 console.log(response);
                 if (response.status == 200){
                     console.log(this.alarms);
+                    this.$emit("getAlarms");
                     
                 }
             });

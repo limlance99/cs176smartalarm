@@ -26,6 +26,7 @@
 
 <script>
 import axios from 'axios'
+import { SERVER_URL } from "../../config.js"
 export default {
     props: ["alarms", "isMorning"],
     created() {
@@ -46,7 +47,7 @@ export default {
                   handler: () => {
                     console.log(this.alarms[key].id);
                     this.alarms.splice(key, 1);
-                    axios.get(`http://localhost:3000/deletealarm/${this.alarms[key].id}`)
+                    axios.get(`${SERVER_URL}/deletealarm/${this.alarms[key].id}`)
                     .then(response => {
                       console.log(response);
                       if (response.status == 200) {

@@ -4,22 +4,22 @@
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning"/>
+          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms"/>
           <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
-          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning"/>
+          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning" @getAlarms="getAlarms"/>
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
         <ion-tab tab="statistics">
-          <Header :header="'Statistics'" />
+          <Header :header="'Statistics'" @getAlarms="getAlarms"/>
           <Statistics />
         </ion-tab>
 
         <ion-tab tab="settings">
-          <Header :header="'Settings'" :isMorning="isMorning"/>
+          <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms"/>
           <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
         </ion-tab>
 
@@ -56,6 +56,7 @@ import Header from "./components/Header.vue";
 
 import { newQuestion } from "./utils";
 import axios from 'axios';
+import { SERVER_URL } from "../config.js"
 // import { ref } from "vue";
 
 export default {
@@ -107,6 +108,7 @@ export default {
     };
   },
   mounted() {
+    console.log(process.env.VUE_APP_ROOT_URL);
   },
   created() {
     this.updateTime();
@@ -124,7 +126,7 @@ export default {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
-      deferredPrompt = e;
+      var deferredPrompt = e;
       // Update UI notify the user they can install the PWA
       showInstallPromotion();
     });
@@ -145,7 +147,7 @@ export default {
   methods: {
     getAlarms() {
       console.log("HOY");
-      axios.get("http://localhost:3000/getalarms/16")
+      axios.get(`${SERVER_URL}/getalarms/16`)
       .then(response => {
         console.log(response);
         this.listOfAlarms = response.data;
@@ -155,11 +157,11 @@ export default {
     toggleOne(key) {
       console.log('TOGGLE', this.listOfAlarms[key], this.listOfAlarms[key].id);
       this.listOfAlarms[key].isActive = this.listOfAlarms[key].isActive == 1 ? 0 : 1;
-      axios.post(`http://localhost:3000/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
+      axios.post(`${SERVER_URL}/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
       .then(response => {
           console.log(response);
           if (response.status == 200){
-              // console.log(this.listOfAlarms);
+              this.getAlarms();
           }
       });
     },

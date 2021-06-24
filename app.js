@@ -1,3 +1,5 @@
+const port = process.env.PORT || 3000
+
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require("body-parser");
@@ -20,6 +22,7 @@ db.connect((err) => {
 
 const app = express();
 
+// app.use(express.static("dist"));
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -228,45 +231,6 @@ app.get('/getsetting/:userID', (req, res) => {
     });
 });
 
-// app.get('/getalarms/:userID', (req, res) => {
-// let sql = `SELECT * FROM alarms WHERE userId = ${req.params.userID} INNER JOIN repetitions ON alarms.id = repetitions.alarmId`;
-    // let sql = `SELECT * FROM alarms WHERE userId = ${req.params.userID}`;
-    // let query = db.query(sql, async (err, result) => {
-    //     if (err) {
-    //         throw err;
-    //     }
-    //     // res.send(result);
-    //     let returnAlarms = result;
-    //     console.log(result);
-    //     if (result.length == 0) {
-    //         res.send(result);
-    //     }
-    //     else {
-    //         for (var item in returnAlarms) {
-    //             console.log(item, returnAlarms[item]);
-    //             let sql2 = `SELECT day, isActive FROM repetitions WHERE alarmID = ${returnAlarms[item].id}`;
-    //             let query2 = await db.query(sql2, (err, result) => {
-    //                 if (err) {
-    //                     throw err;
-    //                 }
-    //                 console.log(item, result);
-    //                 // returnAlarms[item].repetitions = result;
-    //                 // if (item == returnAlarms.length - 1) {
-    //                 //     console.log("SEND THS:", returnAlarms, item);
-                        
-    //                 // }
-    //             });
-    //             console.log("wut")
-    //         }
-    //         console.log("??")
-    //         res.send(returnAlarms);
-    //     }
-        
-    //     // console.log("SENND THIS: ", result);
-    //     // res.send(result);
-//     });
-//     console.log(">>>>")
-// });
 
 app.get('/getalarms/:userID', (req, res) => {
         let sql = `SELECT * FROM alarms WHERE userId = ${req.params.userID}`;
@@ -389,8 +353,8 @@ app.get('/deletealarms', (req, res) => {
     });
 })
 
-app.listen('3000', () => {
-    console.log('Server started on port 3000');
+app.listen(port, () => {
+    console.log('Server started on port: '+ port);
 });
 
 
