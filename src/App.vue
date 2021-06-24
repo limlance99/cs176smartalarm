@@ -105,6 +105,7 @@ export default {
         { time: "06:08", ampm: "PM", isActive: true, repetitions: ['S'] },
       ],
       hiddenAlarms: [],
+      deferredPrompt: null
     };
   },
   mounted() {
@@ -120,15 +121,25 @@ export default {
     //   }.bind(this),
     //   10000,
     // );
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       alert("beforeinstallprompt");
 
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
-      var deferredPrompt = e;
+      this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
-      showInstallPromotion();
+      // showInstallPromotion();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      // Hide the app-provided install promotion
+      // hideInstallPromotion();
+      // Clear the deferredPrompt so it can be garbage collected
+      this.deferredPrompt = null;
+      // Optionally, send analytics event to indicate successful install
+      alert('PWA was installed');
     });
   },
   mounted() {

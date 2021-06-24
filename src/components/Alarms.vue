@@ -15,7 +15,7 @@
             </ion-col>
           </ion-col>
           <ion-col class="vertical-align-content" size="auto">
-            <ion-toggle  :checked="alarm.isActive ==1" :color="[isMorning ? 'secondary' : 'primary']" @ionChange="toggleAlarm(key)" ></ion-toggle>
+            <ion-toggle  :checked="alarm.isActive ==1" :color="[isMorning ? 'secondary' : 'primary']" @ionChange="toggleAlarm(key,$event)" ></ion-toggle>
           </ion-col>
         </ion-row>
         </ion-grid>
@@ -33,9 +33,14 @@ export default {
       console.log("HoOOoY:",this.alarms)
     },
     methods: {
-        toggleAlarm(key) {
-          console.log("TOGGGLE");
-          this.$emit("toggleOne", key);
+        toggleAlarm(key,event) {
+          console.log("TOGGGLE", event.detail.checked, this.alarms[key].isActive);
+          if(event.detail.checked != this.alarms[key].isActive) { //THIS FREAKING ANNOYING IONIC BUG THAT CAUSES AN INFINITE LOOP!!!!!!!
+            this.$emit("toggleOne", key);
+          }
+        },
+        thisDoesNothing() {
+          console.log('cant change the value of clicked here');
         },
         async presentActionSheet(key) {
           const actionSheet = await this.$ionic.actionSheetController
