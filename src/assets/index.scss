@@ -157,6 +157,11 @@ p {
 .p {
   font-size: 23.20px !important;
 }
+
+.span {
+  font-size: 15.0px !important;
+  padding: 0 !important;
+}
 .alert-message .no-margin {
   margin: 0px !important;
   padding: 0px !important;
@@ -216,15 +221,20 @@ ion-item {
 ion-toolbar {
   --background: transparent;
   --ion-color-base: transparent !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 ion-tab-bar {
   --background: #22243F;
 }
 
+.header {
+  backdrop-filter: blur(6px) !important;
+}
 /* Remove bottom border on md */
 .header-md::after {
   background-image: none;
+
 }
 
 /* Remove bottom border on ios */
