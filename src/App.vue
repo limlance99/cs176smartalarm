@@ -4,22 +4,22 @@
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :isMorning="isMorning" @pushToList="pushToList"/>
-          <Alarms :alarms="listOfAlarms" v-on:toggleOne="toggleOne" :isMorning="isMorning" @deleteAlarm="deleteAlarm"/>
+          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms" @pushToList="pushToList" :userID="userID"/>
+          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
         </ion-tab>
 
         <ion-tab tab="clock">
-          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning"/>
+          <Header :header="'Clock'" @toggleAlarm="toggleAlarm" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
           <Clock :time="time" :date="date" :ampm="ampm" />
         </ion-tab>
 
         <ion-tab tab="statistics">
-          <Header :header="'Statistics'" />
+          <Header :header="'Statistics'" @getAlarms="getAlarms" :userID="userID"/>
           <Statistics />
         </ion-tab>
 
         <ion-tab tab="settings">
-          <Header :header="'Settings'" :isMorning="isMorning"/>
+          <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
           <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
         </ion-tab>
 
@@ -55,9 +55,9 @@ import Header from "./components/Header.vue";
 import Pigstep from "./ringtones/Pigstep-InsaneInTheRain.mp3"
 
 import { newQuestion } from "./utils";
-
+import axios from 'axios';
+import { SERVER_URL } from "../config.js"
 // import { ref } from "vue";
-
 
 export default {
   name: "app",
@@ -68,6 +68,7 @@ export default {
   },
   data() {
     return {
+      userID: 16,
       isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
@@ -107,18 +108,42 @@ export default {
       intervalcheckTime: null,
       intervalcheckAlarms: null,
       ringtone: new Audio(Pigstep),
+      deferredPrompt: null,
     };
   },
   created() {
     this.updateTime();
+    this.getAlarms();
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      alert("beforeinstallprompt");
+
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.deferredPrompt = e;
+      // Update UI notify the user they can install the PWA
+      // showInstallPromotion();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      // Hide the app-provided install promotion
+      // hideInstallPromotion();
+      // Clear the deferredPrompt so it can be garbage collected
+      this.deferredPrompt = null;
+      // Optionally, send analytics event to indicate successful install
+      alert('PWA was installed');
+      this.createUser();
+
+    });
+  },
+  mounted() {
     this.intervalcheckTime = setInterval(
       function () {
         this.updateTime();
       }.bind(this),
       10000,
     );
-  },
-  mounted() {
     this.startAlarmChecker();
   },
   watch: {
@@ -165,6 +190,35 @@ export default {
       let item = Object.assign({}, this.listOfAlarms[key]);
       this.$set(item, 'isActive', !item.isActive);
       this.$set(this.listOfAlarms, key, item);
+      axios.post(`${SERVER_URL}/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
+      .then(response => {
+          console.log(response);
+          if (response.status == 200){
+              this.getAlarms();
+          }
+      });
+    },
+    createUser() {
+      console.log('CREATING USER');
+      axios.get(`${SERVER_URL}/adduser`)
+      .then(response => {
+        console.log(response);
+        if (response.status == 200) {
+          alert('created new user with ID:', response.data.id);
+          this.userID = response.data.id;
+          console.log(this.userID, response.data.id);
+          this.getAlarms();
+        }
+      });
+    },
+    getAlarms() {
+      console.log("HOY");
+      axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
+      .then(response => {
+        console.log(response);
+        this.listOfAlarms = response.data;
+        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
+      });
     },
 
     checkAlarms() {
@@ -225,7 +279,7 @@ export default {
     },
     updateTime() {
       var cd = new Date();
-
+      this.isMorning = cd.getHours() > 7 && cd.getHours() < 17;
       this.time =
         this.formatHour(cd.getHours()) +
         ":" +

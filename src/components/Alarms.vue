@@ -4,13 +4,13 @@
       <ion-list-header>
         <ion-label> Alarms </ion-label>
       </ion-list-header> -->
-
+      <h5 v-if="alarms.length == 0" class="regularText"> You have no alarms. Add an alarm now. </h5>
       <ion-item v-for="(alarm, key) in listOfAlarms" :key="key" lines="none">
         <ion-grid>
         <ion-row class="outerbox ion-margin-vertical" style="width:100%">
           <ion-col @click="presentActionSheet(key)">
-            <h4 :class="[alarm.isActive ? 'regularText' : 'disabledText']" style="margin:0"> {{alarm.time + alarm.ampm}} </h4>
-            <ion-col v-for="(day, index) in alarm.repetitions" :key="index">
+            <h4 :class="[alarm.isActive ? 'regularText' : 'disabledText']" style="margin:0"> {{alarm.time + alarm.ampm}}</h4>
+            <ion-col v-for="(day, index) in alarm.repetitions.filter(day => day.isActive)" :key="index">
               <span style="margin:0" :class="[alarm.isActive ? 'regularText' : 'disabledText']" v-if="day.isActive" > {{ day.day }} </span>
             </ion-col>
           </ion-col>
@@ -25,7 +25,8 @@
 </template>
 
 <script>
-
+import axios from 'axios'
+import { SERVER_URL } from "../../config.js"
 export default {
     props: ["alarms", "isMorning"],
     computed: {
@@ -47,6 +48,14 @@ export default {
                   role: 'destructive',
                   handler: () => {
                     this.$emit("deleteAlarm", key);
+                    axios.get(`${SERVER_URL}/deletealarm/${this.listOfAlarms[key].id}`)
+                    .then(response => {
+                      console.log(response);
+                      if (response.status == 200) {
+                        //
+                      }
+                    });
+                    
                   },
                 },
                 {

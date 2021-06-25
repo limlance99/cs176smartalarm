@@ -18,9 +18,10 @@
 // import { IonButton, IonContent, IonPage, modalController } from '@ionic/vue';
 // import modalController from '@ionic/vue';
 import AddAlarm from './AddAlarm.vue';
-
+import { SERVER_URL } from "../../config.js"
+import axios from "axios"
 export default {
-    props: ["header", "isMorning"],
+    props: ["header", "isMorning", "userID"],
     methods: {
         async openModal() {
             const modal = await this.$ionic.modalController
@@ -37,7 +38,16 @@ export default {
             if (data == null) {
                 return;
             }
-            this.$emit("pushToList", data);
+            
+            axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
+            .then(response => {
+                console.log(response);
+                if (response.status == 200){
+                    this.$emit("pushToList", data);
+                    this.$emit("getAlarms");   
+                }
+            });
+            
         },
     }
 }
