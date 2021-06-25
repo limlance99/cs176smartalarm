@@ -1,5 +1,9 @@
 module.exports = {
   pwa: {
+    name: 'Smart Alarm',
+    short_name: 'Smart Alarm',
+    themeColor: '#22243F',
+    tileColor: '#22243F', 
     workboxPluginMode: 'GenerateSW',
     appleMobileWebAppCapable: 'yes',
     workboxOptions: {
