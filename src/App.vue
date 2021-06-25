@@ -132,13 +132,12 @@ export default {
       // Stash the event so it can be triggered later.
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
-      // showInstallPromotion();
-
+      this.showInstallAlert();
       //if user id isnt the default user ID, delete user and set user id to 16
       if (this.userID != 16) {
         this.deleteUser(this.userID);
-        this.userID = 16;
       }
+
     });
 
     window.addEventListener('appinstalled', () => {
@@ -166,6 +165,35 @@ export default {
     }
   },
   methods: {
+    async showInstallAlert() {
+      const alert = await this.$ionic.alertController
+        .create({
+          message: `<p class="no-margin"> Install this PWA Now!!! </p>`,
+          mode: "ios",
+          buttons: [
+            {
+              text: "Download",
+              handler: () => {
+                this.deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                this.deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                  } else {
+                    console.log('User dismissed the install prompt');
+                  }
+                });
+                return true;
+              },
+            },
+          ],
+          backdropDismiss: false,
+        });
+      await alert.present();
+
+      const { role } = await alert.onDidDismiss();
+      console.log('onDidDismiss resolved with role', role);
+    },
     startAlarmChecker() {
       // console.log("start again");
       // console.log(this.listOfAlarms);
@@ -240,6 +268,8 @@ export default {
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
       .then(response => {
         console.log(response);
+        this.userID = 16;
+        this.getAlarms();
       });
     },
     checkAlarms() {
