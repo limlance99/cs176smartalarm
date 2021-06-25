@@ -5,7 +5,7 @@
       <ion-tabs>
         <ion-tab tab="alarms">
           <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms" @pushToList="pushToList" :userID="userID"/>
-          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
+          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning" @deleteAlarm="deleteAlarm"/>
         </ion-tab>
 
         <ion-tab tab="clock">
@@ -214,6 +214,7 @@ export default {
     },
     deleteAlarm(key) {
       this.listOfAlarms.splice(key, 1);
+      console.log("lmaio");
     },
     convertTime12to24(data) {
             let {time, ampm} = data;
@@ -231,7 +232,7 @@ export default {
             },
     toggleOne(key) {
       let item = Object.assign({}, this.listOfAlarms[key]);
-      this.$set(item, 'isActive', !item.isActive);
+      this.$set(item, 'isActive', item.isActive == 1 ? 0 : 1);
       this.$set(this.listOfAlarms, key, item);
       axios.post(`${SERVER_URL}/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
       .then(response => {

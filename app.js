@@ -6,16 +6,13 @@ const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser');
 const session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
-var cors = require('cors');
 
 var options = {
 	host: 'localhost',
-	// port: 3306,
 	user: 'root',
 	password: 'password',
 	database: 'smartalarm',
     expiration: 86400000,
-	// Whether or not to create the sessions database table, if one does not already exist:
 	createDatabaseTable: true,
 };
 
@@ -41,7 +38,7 @@ db.connect((err) => {
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use(cookieParser());
+
 app.use(session({
     secret: 'jodsnfjan2934jdasd1', //key that will sign cookie,
     store: sessionStore,
@@ -49,23 +46,6 @@ app.use(session({
     saveUninitialized: false,// if we have not modified the session, we dont want it to save
     
 }));
-
-// app.use(function (req, res, next) {
-// // check if client sent cookie
-//     var cookie = req.cookies == undefined ? undefined : req.cookies.id;
-//     if (cookie === undefined) {
-//         // no: set a new cookie
-//         var randomNumber=Math.random().toString();
-//         randomNumber=randomNumber.substring(2,randomNumber.length);
-//         res.cookie('id',randomNumber, { maxAge: 900000, httpOnly: true });
-//         console.log('cookie created successfully', JSON.stringify(req.cookies), JSON.stringify(req.headers.cookie));
-//     } else {
-//         // yes, cookie was already present 
-//         console.log('cookie exists', req.cookies.id);
-//     } 
-//     next(); // <-- important!
-// });
-
 
 app.use(express.static("dist"));
 
@@ -78,16 +58,12 @@ app.use(function(req, res, next) {
     next();
 });
 
-
+//called when App.vue is created
 app.get("/login", (req,res) => {
     req.session.isAuth = true;
     console.log('User opened app:' + req.session.user);
     res.send({id: req.session.user});
-    // res.send("Hello: "+ req.session.id + " " +req.session.user);
 })
-
-
-
 
 //CREATE DATABASE*************************************************************************************/
 app.get('/createdb', (req, res) => {
@@ -125,18 +101,6 @@ app.get('/createalarms', (req, res) => {
         // console.log(result);
     });
 });
-
-// app.get('/createrepetitions', (req, res) => {
-//     let query = 'DROP TABLE IF EXISTS repetitions; '
-//     query += 'CREATE TABLE repetitions(id int AUTO_INCREMENT, alarmID int, day VARCHAR(255), isActive BOOL, PRIMARY KEY (id), FOREIGN KEY (alarmID) REFERENCES alarms(id) ON DELETE CASCADE)'
-//     db.query(query, (err, result) => {
-//         if (err) {
-//             throw err;
-//         }
-//         res.send('repetitions table created');
-//         console.log(result);
-//     });
-// });
 
 app.get('/createsettings', (req, res) => {
     //difficulty: 0- easy; 1- medium; 2-difficult
