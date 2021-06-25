@@ -33,7 +33,7 @@
 
 
             <ion-row style="margin-bottom: 10px">
-                <ion-col size="7">
+                <ion-col>
                     <ion-select :value="graphToShow" @ionChange="onChange($event)" style="padding:2px" interface="popover" mode="ios" class="regularText">
                         <ion-select-option value="snoozes">Snoozes</ion-select-option>
                         <ion-select-option value="timeToWake">Time Taken to Wake Up</ion-select-option>
@@ -41,7 +41,7 @@
                         <ion-select-option value="sleepQuality">Sleep Quality</ion-select-option>
                     </ion-select>
                 </ion-col>
-                <ion-col size="5">
+                <ion-col>
                     <p class="regularText span" style="text-align:right"> 7 days </p>
                 </ion-col>
             </ion-row>
