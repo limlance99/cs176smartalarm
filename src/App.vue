@@ -52,7 +52,7 @@ import Alarms from "./components/Alarms.vue";
 import Statistics from "./components/Statistics.vue";
 import Settings from "./components/Settings.vue";
 import Header from "./components/Header.vue";
-
+import Pigstep from "./ringtones/Pigstep-InsaneInTheRain.mp3"
 
 import { newQuestion } from "./utils";
 
@@ -106,6 +106,7 @@ export default {
       hiddenAlarms: [],
       intervalcheckTime: null,
       intervalcheckAlarms: null,
+      ringtone: new Audio(Pigstep),
     };
   },
   created() {
@@ -262,6 +263,7 @@ export default {
       this.currentDiff = val;
     },
     toggleAlarm(alarmTime) {
+      this.ringtone.play();
       this.math = newQuestion[this.currentDiff]();
       // console.log("im alarm");
       return this.$ionic.alertController
@@ -346,6 +348,8 @@ export default {
                 );
                 // console.log(this.hiddenAlarms);
                 this.startAlarmChecker();
+                this.ringtone.pause();
+                this.ringtone.currentTime = 0;
                 return true;
               },
             },
@@ -353,6 +357,8 @@ export default {
               text: "Stop Alarm",
               handler: (data) => {
                 this.startAlarmChecker();
+                this.ringtone.pause();
+                this.ringtone.currentTime = 0;
                 return true;
               },
             },
