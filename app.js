@@ -119,7 +119,7 @@ app.get('/createsettings', (req, res) => {
 app.get('/createstatistics', (req, res) => {
     //dateTime contains date and wake up time
     let query = 'DROP TABLE IF EXISTS statistics; '
-    query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, dateTime DATETIME, timeToWake DOUBLE, sleepQuality int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+    query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), sleepQuality int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
             throw err;
