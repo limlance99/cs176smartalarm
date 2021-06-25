@@ -113,8 +113,17 @@ export default {
   },
   created() {
     this.updateTime();
-    this.getAlarms();
     
+    // get user id from session
+    axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
+    .then(response => {
+      // console.log("user current logged in: ",response.data);
+      this.userID = response.data.id != null ? response.data.id : 16;
+      console.log("current user: ", this.userID);
+      this.getAlarms();
+    });
+
+
     window.addEventListener('beforeinstallprompt', (e) => {
       alert("beforeinstallprompt");
 
@@ -124,6 +133,12 @@ export default {
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
       // showInstallPromotion();
+
+      //if user id isnt the default user ID, delete user and set user id to 16
+      if (this.userID != 16) {
+        this.deleteUser(this.userID);
+        this.userID = 16;
+      }
     });
 
     window.addEventListener('appinstalled', () => {
@@ -220,7 +235,13 @@ export default {
         // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
     },
-
+    deleteUser(userID) {
+      console.log("deleting user from db: ", userID);
+      axios.get(`${SERVER_URL}/deleteuser/${userID}`)
+      .then(response => {
+        console.log(response);
+      });
+    },
     checkAlarms() {
       var length = this.listOfAlarms.length;
       var cd = new Date();
