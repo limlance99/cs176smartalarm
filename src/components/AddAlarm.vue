@@ -11,8 +11,8 @@
               </ion-button>
             </ion-col>
             <ion-col class="vertical-align-content">
-              <ion-title style="padding-left:10px">
-                  <h6 class="headerText ion-text-center" style="margin:0"> Add Alarm </h6>
+              <ion-title style="padding:0px">
+                  <h6 :class="[isMorning ? '' : 'dark']" class='headerText ion-text-center'  style="margin:0; width:100%"> Add Alarm {{ isMorning }} </h6>
               </ion-title>
             </ion-col>
             <ion-col size="auto" class="vertical-align-content"> 
