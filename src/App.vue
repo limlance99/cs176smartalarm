@@ -331,7 +331,7 @@ export default {
     },
     updateTime() {
       var cd = new Date();
-      this.isMorning = cd.getHours() > 7 && cd.getHours() < 17;
+      this.isMorning = cd.getHours() >= 7 && cd.getHours() < 17;
       this.time =
         this.formatHour(cd.getHours()) +
         ":" +
@@ -362,7 +362,6 @@ export default {
       if (num == 0) {
         return 12;
       }
-      this.isMorning = num > 7 && num < 17;
       return this.zeroPadding(num, 2);
     },
     changeDiff(val) {

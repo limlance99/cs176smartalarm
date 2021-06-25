@@ -2,7 +2,7 @@
     <ion-header no-border>
         <ion-toolbar mode="ios" style="height:67.2px" class="vertical-align-content">
             <ion-title>
-                <h6 class="headerText"> {{header}} </h6>
+                <h6 :class="[[isMorning ? '' : 'dark'], 'headerText']"> {{header}} </h6>
             </ion-title>
 
             <ion-button no-padding :color="[isMorning ? 'secondary' : 'primary']" fill="clear" v-if="header=='Alarms'" slot="end" style="margin-right:10px; font-size:24px; font-weight:100" @click="openModal">
