@@ -4,8 +4,8 @@
       <!-- <ion-vue-router/> -->
       <ion-tabs>
         <ion-tab tab="alarms">
-          <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning"/>
-          <Alarms :alarms="listOfAlarms" v-on:toggleAlarm="toggleOne" :isMorning="isMorning"/>
+          <Header :header="'Alarms'" :isMorning="isMorning" @pushToList="pushToList"/>
+          <Alarms :alarms="listOfAlarms" v-on:toggleOne="toggleOne" :isMorning="isMorning" @deleteAlarm="deleteAlarm"/>
         </ion-tab>
 
         <ion-tab tab="clock">
@@ -100,39 +100,70 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "05:30", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
+        { time: "02:07", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
         { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
       ],
       hiddenAlarms: [],
+      intervalcheckTime: null,
+      intervalcheckAlarms: null,
     };
   },
-
   created() {
     this.updateTime();
-    // this.intervalid1 = setInterval(
-    //   function () {
-    //     this.updateTime();
-    //     this.checkAlarms();
-    //   }.bind(this),
-    //   10000,
-    // );
-  },
-  mounted() {
-    this.intervalid1 = setInterval(
+    this.intervalcheckTime = setInterval(
       function () {
         this.updateTime();
-        this.checkAlarms();
       }.bind(this),
-      1000,
+      10000,
     );
+  },
+  mounted() {
+    this.startAlarmChecker();
   },
   watch: {
     ampm() {
     }
   },
   methods: {
+    startAlarmChecker() {
+      // console.log("start again");
+      // console.log(this.listOfAlarms);
+      clearInterval(this.intervalcheckAlarms);
+      this.intervalcheckAlarms = setInterval(
+      function () {
+        this.checkAlarms();
+      }.bind(this),
+      1000,
+      );
+    },
+    pushToList(data) {
+      clearInterval(this.intervalcheckAlarms);
+      let index = this.listOfAlarms.findIndex(element => this.convertTime12to24(element) > this.convertTime12to24(data));
+      if (index == -1) this.listOfAlarms.push(data);
+      else this.listOfAlarms.splice(index, 0, data);
+      this.startAlarmChecker();
+    },
+    deleteAlarm(key) {
+      this.listOfAlarms.splice(key, 1);
+    },
+    convertTime12to24(data) {
+            let {time, ampm} = data;
+            let [hours, minutes] = time.split(':');
+
+            if (hours === '12') {
+                hours = '00';
+            }
+
+            if (ampm === 'PM') {
+                hours = parseInt(hours, 10) + 12;
+            }
+
+            return `${hours}:${minutes}`;
+            },
     toggleOne(key) {
-      this.listOfAlarms[key].isActive = !this.listOfAlarms[key].isActive;
+      let item = Object.assign({}, this.listOfAlarms[key]);
+      this.$set(item, 'isActive', !item.isActive);
+      this.$set(this.listOfAlarms, key, item);
     },
 
     checkAlarms() {
@@ -154,26 +185,27 @@ export default {
       var time = `${hour}:${mins}`;
       // console.log(this.listOfAlarms);
       for (let i = 0; i < length; ++i) {
-        let item = this.listOfAlarms[i];
-        if (!item.isActive) continue;
+        let item = Object.assign({}, this.listOfAlarms[i]);
+        if (item.isActive == false) continue;
         if (item.time == time && item.ampm == amOrpm) {
-          // console.log('alarms were checked');
-          // console.log(this.listOfAlarms[i].isActive);
-          // this.listOfAlarms[i].isActive = !this.listOfAlarms[i].isActive;
-          this.$set(this.listOfAlarms[i], "isActive", !this.listOfAlarms[i].isActive);
-          // console.log(this.listOfAlarms[i].isActive);
+          this.$set(item, 'isActive', false);
+          this.$set(this.listOfAlarms, i, item);
+          clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(item);
         }
       }
 
       var hiddenLength = this.hiddenAlarms.length;
       for (let i = 0; i < hiddenLength; ++i) {
-        let item = this.hiddenAlarms[i];
+        let item = Object.assign({},this.hiddenAlarms[i]);
         if (!item.isActive) continue;
         if (item.time == time && item.ampm == amOrpm) {
-          this.toggleAlarm(item);
           // this.hiddenAlarms.splice(i, 1);
-          this.hiddenAlarms[i].isActive = !this.hiddenAlarms[i].isActive;
+          // this.hiddenAlarms[i].isActive = !this.hiddenAlarms[i].isActive;
+          item.isActive = false;
+          clearInterval(this.intervalcheckAlarms);
+          this.$set(this.hiddenAlarms, i, item);
+          this.toggleAlarm(item);
         }
       }
 
@@ -229,8 +261,9 @@ export default {
     changeDiff(val) {
       this.currentDiff = val;
     },
-    async toggleAlarm(alarmTime) {
-      this.math = await newQuestion[this.currentDiff]();
+    toggleAlarm(alarmTime) {
+      this.math = newQuestion[this.currentDiff]();
+      // console.log("im alarm");
       return this.$ionic.alertController
         .create({
           message: `<p class="no-margin"> ${this.math.question} </p>`,
@@ -311,13 +344,15 @@ export default {
                 this.hiddenAlarms.push(
                   newHiddenAlarm
                 );
-                console.log(this.hiddenAlarms);
+                // console.log(this.hiddenAlarms);
+                this.startAlarmChecker();
                 return true;
               },
             },
             {
               text: "Stop Alarm",
               handler: (data) => {
+                this.startAlarmChecker();
                 return true;
               },
             },

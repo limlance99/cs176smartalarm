@@ -133,7 +133,7 @@ export default {
         let thing = { time: t, ampm: ap, isActive: true, repetitions: this.repetitions};
 
         const modal = await this.$ionic.modalController;
-        return modal.dismiss(thing)
+        return modal.dismiss(thing);
       },
 
       async exitModal() {

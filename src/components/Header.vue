@@ -20,7 +20,7 @@
 import AddAlarm from './AddAlarm.vue';
 
 export default {
-    props: ["header", "alarms", "isMorning"],
+    props: ["header", "isMorning"],
     methods: {
         async openModal() {
             const modal = await this.$ionic.modalController
@@ -37,23 +37,8 @@ export default {
             if (data == null) {
                 return;
             }
-            this.alarms.push(data);
-            this.alarms.sort((a, b) => (this.convertTime12to24(a) > this.convertTime12to24(b)) ? 1 : -1)
+            this.$emit("pushToList", data);
         },
-        convertTime12to24(data) {
-            let {time, ampm} = data;
-            let [hours, minutes] = time.split(':');
-
-            if (hours === '12') {
-                hours = '00';
-            }
-
-            if (ampm === 'PM') {
-                hours = parseInt(hours, 10) + 12;
-            }
-
-            return `${hours}:${minutes}`;
-            }
     }
 }
 </script>
