@@ -3,15 +3,29 @@ const port = process.env.PORT || 3000
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require("body-parser");
+// const cookieParser = require('cookie-parser');
+const session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
+
+var options = {
+	host: 'localhost',
+	user: 'root',
+	password: 'password',
+	database: 'smartalarm',
+    expiration: 86400000,
+	createDatabaseTable: true,
+};
 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'password',
     database: 'smartalarm',
-    multipleStatements: true
+    multipleStatements: true,
+    
 });
 
+var sessionStore = new MySQLStore(options);
 
 db.connect((err) => {
     if (err) {
@@ -20,17 +34,36 @@ db.connect((err) => {
     console.log('mySQL Connected...')
 });
 
+
 const app = express();
-
-app.use(express.static("dist"));
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(session({
+    secret: 'jodsnfjan2934jdasd1', //key that will sign cookie,
+    store: sessionStore,
+    resave: false, // for every request to the server, dont create new session
+    saveUninitialized: false,// if we have not modified the session, we dont want it to save
+    
+}));
+
+app.use(express.static("dist"));
+
+
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Credentials', true)
+    next();
+});
+
+//called when App.vue is created
+app.get("/login", (req,res) => {
+    req.session.isAuth = true;
+    console.log('User opened app:' + req.session.user);
+    res.send({id: req.session.user});
+})
 
 //CREATE DATABASE*************************************************************************************/
 app.get('/createdb', (req, res) => {
@@ -40,7 +73,7 @@ app.get('/createdb', (req, res) => {
             throw err;
         }
         res.send('database created');
-        console.log(result);
+        // console.log(result);
     });
 })
 
@@ -53,7 +86,7 @@ app.get('/createusers', (req, res) => {
             throw err;
         }
         res.send('users table created');
-        console.log(result);
+        // console.log(result);
     });
 });
 
@@ -65,21 +98,9 @@ app.get('/createalarms', (req, res) => {
             throw err;
         }
         res.send('alarms table created');
-        console.log(result);
+        // console.log(result);
     });
 });
-
-// app.get('/createrepetitions', (req, res) => {
-//     let query = 'DROP TABLE IF EXISTS repetitions; '
-//     query += 'CREATE TABLE repetitions(id int AUTO_INCREMENT, alarmID int, day VARCHAR(255), isActive BOOL, PRIMARY KEY (id), FOREIGN KEY (alarmID) REFERENCES alarms(id) ON DELETE CASCADE)'
-//     db.query(query, (err, result) => {
-//         if (err) {
-//             throw err;
-//         }
-//         res.send('repetitions table created');
-//         console.log(result);
-//     });
-// });
 
 app.get('/createsettings', (req, res) => {
     //difficulty: 0- easy; 1- medium; 2-difficult
@@ -91,7 +112,7 @@ app.get('/createsettings', (req, res) => {
             throw err;
         }
         res.send('settings table created');
-        console.log(result);
+        // console.log(result);
     })
 })
 
@@ -104,7 +125,7 @@ app.get('/createstatistics', (req, res) => {
             throw err;
         }
         res.send('statistics table created');
-        console.log(result);
+        // console.log(result);
     })
 })
 
@@ -119,6 +140,11 @@ app.get('/adduser', (req, res) => {
         }
         res.send({id: result.insertId});
         console.log('user added');
+        req.session.user = result.insertId;
+        req.session.isLoggedIn = true;
+        req.session.save();
+        // res.cookie('id', result.insertId, { maxAge: 900000, httpOnly: true });
+        // console.log(req.cookies);
         let sql2 = 'INSERT INTO settings SET ?'
         let post2 = {userID: result.insertId, difficulty: 0, mode: 0}
         console.log(post2);
@@ -172,7 +198,7 @@ app.get('/getusers', (req, res) => {
             throw err;
         }
         res.send(result);
-        console.log(result);
+        // console.log(result);
     });
 });
 
@@ -247,15 +273,11 @@ app.get('/getalarms/:userID', (req, res) => {
 async function printFiles (result) {
     for (const item of result) {
         item.repetitions = JSON.parse(item.repetitions);
-        console.log(item);
-    }
-    const increment = {
-        'AM' : 0,
-        'PM' : 12
+        // console.log(item);
     }
     result.sort((a, b) => (convertTime12to24(a) > convertTime12to24(b)) ? 1 : -1);
-    console.log("DONE")
-    console.log(result);
+    // console.log("DONE")
+    // console.log(result);
     return result;
 }
 
@@ -273,19 +295,10 @@ function convertTime12to24(data) {
 
     return `${hours}:${minutes}`;
 }
-// app.get('/getalarms', (req, res) => {
-//     let sql = `SELECT * FROM alarms`;
-//     let query = db.query(sql, (err, result) => {
-//         if (err) {
-//             throw err;
-//         }
-//         res.send(result);
-        
-//     });
-// });
 
-app.get('/getrepetitions', (req, res) => {
-    let sql = `SELECT * FROM repetitions`;
+
+app.get('/getsessions', (req, res) => {
+    let sql = `SELECT * FROM sessions`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             throw err;

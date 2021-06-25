@@ -5,7 +5,7 @@
       <ion-tabs>
         <ion-tab tab="alarms">
           <Header :header="'Alarms'" :alarms="listOfAlarms" :isMorning="isMorning" @getAlarms="getAlarms" @pushToList="pushToList" :userID="userID"/>
-          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning"/>
+          <Alarms :alarms="listOfAlarms" @toggleOne="toggleOne" :isMorning="isMorning" @deleteAlarm="deleteAlarm"/>
         </ion-tab>
 
         <ion-tab tab="clock">
@@ -113,8 +113,17 @@ export default {
   },
   created() {
     this.updateTime();
-    this.getAlarms();
     
+    // get user id from session
+    axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
+    .then(response => {
+      // console.log("user current logged in: ",response.data);
+      this.userID = response.data.id != null ? response.data.id : 16;
+      console.log("current user: ", this.userID);
+      this.getAlarms();
+    });
+
+
     window.addEventListener('beforeinstallprompt', (e) => {
       alert("beforeinstallprompt");
 
@@ -123,7 +132,12 @@ export default {
       // Stash the event so it can be triggered later.
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
-      // showInstallPromotion();
+      this.showInstallAlert();
+      //if user id isnt the default user ID, delete user and set user id to 16
+      if (this.userID != 16) {
+        this.deleteUser(this.userID);
+      }
+
     });
 
     window.addEventListener('appinstalled', () => {
@@ -151,6 +165,35 @@ export default {
     }
   },
   methods: {
+    async showInstallAlert() {
+      const alert = await this.$ionic.alertController
+        .create({
+          message: `<p class="no-margin"> Install this PWA Now!!! </p>`,
+          mode: "ios",
+          buttons: [
+            {
+              text: "Download",
+              handler: () => {
+                this.deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                this.deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                  } else {
+                    console.log('User dismissed the install prompt');
+                  }
+                });
+                return true;
+              },
+            },
+          ],
+          backdropDismiss: false,
+        });
+      await alert.present();
+
+      const { role } = await alert.onDidDismiss();
+      console.log('onDidDismiss resolved with role', role);
+    },
     startAlarmChecker() {
       // console.log("start again");
       // console.log(this.listOfAlarms);
@@ -171,6 +214,7 @@ export default {
     },
     deleteAlarm(key) {
       this.listOfAlarms.splice(key, 1);
+      console.log("lmaio");
     },
     convertTime12to24(data) {
             let {time, ampm} = data;
@@ -188,7 +232,7 @@ export default {
             },
     toggleOne(key) {
       let item = Object.assign({}, this.listOfAlarms[key]);
-      this.$set(item, 'isActive', !item.isActive);
+      this.$set(item, 'isActive', item.isActive == 1 ? 0 : 1);
       this.$set(this.listOfAlarms, key, item);
       axios.post(`${SERVER_URL}/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
       .then(response => {
@@ -220,7 +264,15 @@ export default {
         // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
     },
-
+    deleteUser(userID) {
+      console.log("deleting user from db: ", userID);
+      axios.get(`${SERVER_URL}/deleteuser/${userID}`)
+      .then(response => {
+        console.log(response);
+        this.userID = 16;
+        this.getAlarms();
+      });
+    },
     checkAlarms() {
       var length = this.listOfAlarms.length;
       var cd = new Date();
