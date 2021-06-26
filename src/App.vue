@@ -467,11 +467,12 @@ export default {
             {
               text: "Stop Alarm",
               handler: async (data) => {
+                // Stop ringtone from playing
                 this.startAlarmChecker();
                 this.ringtone.pause();
                 this.ringtone.currentTime = 0;
 
-
+                // Compute time taken to wake up
                 var origDateTime = alarmTime.origDateTime;
                 var curDateTime = new Date();
                 var timeElapsed = curDateTime.getTime() - origDateTime.getTime(); // elapsed time in milliseconds
@@ -486,6 +487,7 @@ export default {
                 
                 var timeToWake = elapsedHours + ':' + elapsedMins + ':' + elapsedSecs; 
 
+                // Format wake up time
                 var hours = curDateTime.getHours();
                 var mins = curDateTime.getMinutes();
                 var ampm = (hours >= 12) ? 'PM' : 'AM';
@@ -494,24 +496,19 @@ export default {
                   mins = mins % 60;
                   hours = hours + 1;
                 }
-
-                if (hours >= 12) {
-                  hours = hours - 12;
-                }
-
-                if (hours < 10) {
-                  hours = '0' + hours;
-                }
-
-                if (mins < 10) {
-                  mins = '0' + mins;
-                }
+                if (hours >= 12) hours = hours - 12;
+                if (hours < 10) hours = '0' + hours;
+                if (mins < 10) mins = '0' + mins;
+                
                 var wakeUpTime = hours + ':' + mins + ' ' + ampm;
 
+                // Get number of snoozes
                 var snoozes = alarmTime.snoozes;
 
+                // Pick wake up mood / sleep quality
                 var mood = await this.openMoodPicker();
 
+                // Hi Gene, this is for you :P
                 console.log("Statistical Data Stuff");
                 console.log("Snoozes : " + snoozes);
                 console.log("Time To Wake: " + timeToWake);
@@ -536,7 +533,7 @@ export default {
               }
           },
           });
-          
+
       await modal.present();
       const { data } = await modal.onWillDismiss();
       if (data == null) {
