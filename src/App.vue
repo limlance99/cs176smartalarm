@@ -33,7 +33,7 @@
             <ion-icon name="clock"></ion-icon>
           </ion-tab-button>
           <ion-tab-button tab="statistics">
-            <ion-label>Statistics</ion-label>
+            <!-- <ion-label>Statistics</ion-label> -->
             <ion-icon name="stats"></ion-icon>
           </ion-tab-button>
           <ion-tab-button tab="settings">
@@ -52,6 +52,7 @@ import Alarms from "./components/Alarms.vue";
 import Statistics from "./components/Statistics.vue";
 import Settings from "./components/Settings.vue";
 import Header from "./components/Header.vue";
+import PickMood from "./components/PickMood.vue";
 import Pigstep from "./ringtones/Pigstep-InsaneInTheRain.mp3"
 
 import { newQuestion } from "./utils";
@@ -61,7 +62,7 @@ import { SERVER_URL } from "../config.js"
 
 export default {
   name: "app",
-  components: { Header, Clock, Alarms, Statistics, Settings},
+  components: { Header, Clock, Alarms, Statistics, Settings, PickMood},
   setup() {
     return {
     };
@@ -295,10 +296,11 @@ export default {
         let item = Object.assign({}, this.listOfAlarms[i]);
         if (item.isActive == false) continue;
         if (item.time == time && item.ampm == amOrpm) {
+          var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
           this.$set(item, 'isActive', false);
           this.$set(this.listOfAlarms, i, item);
           clearInterval(this.intervalcheckAlarms);
-          this.toggleAlarm(item);
+          this.toggleAlarm(toPass);
         }
       }
 
@@ -370,7 +372,7 @@ export default {
     toggleAlarm(alarmTime) {
       this.ringtone.play();
       this.math = newQuestion[this.currentDiff]();
-      // console.log("im alarm");
+
       return this.$ionic.alertController
         .create({
           message: `<p class="no-margin"> ${this.math.question} </p>`,
@@ -419,6 +421,8 @@ export default {
             {
               text: "Snooze",
               handler: (data) => {
+                var origDateTime = alarmTime.origDateTime;
+                var snoozes = alarmTime.snoozes + 1;
                 var hours = parseInt(alarmTime.time.split(':')[0]);
                 var mins = parseInt(alarmTime.time.split(':')[1]) + 1;
                 var ampm = alarmTime.ampm;
@@ -446,6 +450,8 @@ export default {
                   time : fullTime,
                   ampm : ampm,
                   isActive : true,
+                  origDateTime : origDateTime,
+                  snoozes : snoozes,
                 };
 
                 this.hiddenAlarms.push(
@@ -460,10 +466,58 @@ export default {
             },
             {
               text: "Stop Alarm",
-              handler: (data) => {
+              handler: async (data) => {
                 this.startAlarmChecker();
                 this.ringtone.pause();
                 this.ringtone.currentTime = 0;
+
+
+                var origDateTime = alarmTime.origDateTime;
+                var curDateTime = new Date();
+                var timeElapsed = curDateTime.getTime() - origDateTime.getTime(); // elapsed time in milliseconds
+                
+                var elapsedHours = Math.floor(timeElapsed / 3600000).toString();
+                var elapsedMins = Math.floor((timeElapsed - elapsedHours * 3600000) / 60000).toString();
+                var elapsedSecs = Math.floor((timeElapsed - elapsedHours * 3600000 - elapsedMins * 60000)/1000).toString();
+
+                if (elapsedHours.length < 2) elapsedHours = '0' + elapsedHours;
+                if (elapsedMins.length < 2) elapsedMins = '0' + elapsedMins;
+                if (elapsedSecs.length < 2) elapsedSecs = '0' + elapsedSecs;
+                
+                var timeToWake = elapsedHours + ':' + elapsedMins + ':' + elapsedSecs; 
+
+                var hours = curDateTime.getHours();
+                var mins = curDateTime.getMinutes();
+                var ampm = (hours >= 12) ? 'PM' : 'AM';
+
+                if (mins >= 60) {
+                  mins = mins % 60;
+                  hours = hours + 1;
+                }
+
+                if (hours >= 12) {
+                  hours = hours - 12;
+                }
+
+                if (hours < 10) {
+                  hours = '0' + hours;
+                }
+
+                if (mins < 10) {
+                  mins = '0' + mins;
+                }
+                var wakeUpTime = hours + ':' + mins + ' ' + ampm;
+
+                var snoozes = alarmTime.snoozes;
+
+                var mood = await this.openMoodPicker();
+
+                console.log("Statistical Data Stuff");
+                console.log("Snoozes : " + snoozes);
+                console.log("Time To Wake: " + timeToWake);
+                console.log("Wake Up Time: " +  wakeUpTime);
+                console.log("Mood: " + mood);
+
                 return true;
               },
             },
@@ -471,6 +525,26 @@ export default {
           backdropDismiss: false,
         })
         .then((a) => a.present());
+    },
+    async openMoodPicker() {
+      const modal = await this.$ionic.modalController
+          .create({
+          component: PickMood,
+          componentProps: {
+              propsData: {
+                isMorning : this.isMorning,
+              }
+          },
+          });
+          
+      await modal.present();
+      const { data } = await modal.onWillDismiss();
+      if (data == null) {
+          return null;
+      }
+
+      return data;
+        
     },
   },
 };
