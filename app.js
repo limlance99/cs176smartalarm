@@ -6,21 +6,21 @@ const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser');
 const session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
-
+const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE} = require('./config');
 var options = {
-	host: 'localhost',
-	user: 'root',
-	password: 'password',
-	database: 'smartalarm',
+	host: DB_HOST,
+	user: DB_USERNAME,
+	password: DB_PASSWORD,
+	database: DB_DATABASE,
     expiration: 86400000,
 	createDatabaseTable: true,
 };
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'smartalarm',
+    host: DB_USERNAME,
+    user: DB_USERNAME,
+	password: DB_PASSWORD,
+	database: DB_DATABASE,
     multipleStatements: true,
     
 });
