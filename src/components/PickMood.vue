@@ -1,43 +1,22 @@
 <template>
     <ion-content fullscreen class="ion-padding">
         <!-- <ion-list> -->
-        <ion-header no-border mode="ios">
-            <ion-title style="padding:0px">
-                <h6 :class="[isMorning ? '' : 'dark']" class='headerText ion-text-center'  style="margin:0; width:100%"> How is your mood? </h6>
-            </ion-title>
+        <ion-header no-border>
+            <ion-toolbar mode="ios" style="height:67.2px" class="vertical-align-content">
+                <ion-title style="padding:0px">
+                    <h6 :class="[isMorning ? '' : 'dark']" class='headerText ion-text-center'  style="margin:0; width:100%"> How is your mood? </h6>
+                </ion-title>
+            </ion-toolbar>
         </ion-header>
 
-        <ion-list>
+        <ion-row>
             <!-- ['😠', '😞', '😐', '😀', '😂'] -->
-            <ion-radio-group allow-empty-selection="false" @ionChange="changeSelection">
-                <ion-item>
-                    <img :src="require(`@/assets/emojis/${emoticons[0]}.svg`)" class="icon h5" :class="emoticons[0]" />
-                    <ion-radio slot="start" value='0'></ion-radio>
-                </ion-item>
+            <ion-col v-for="(n, index) in 5" :key="index" @click="changeSelection(index)" style="padding:10px; cursor: pointer">
+                <img :src="require(`@/assets/emojis/${emoticons[index]}.svg`)" class="icon h5" :class="[mood == index ? emoticons[index] : 'white-icon']" />
+            </ion-col>
+        </ion-row>
 
-                <ion-item>
-                    <img :src="require(`@/assets/emojis/${emoticons[1]}.svg`)" class="icon h5" :class="emoticons[1]" />
-                    <ion-radio slot="start" value='1'></ion-radio>
-                </ion-item>
-
-                <ion-item>
-                    <img :src="require(`@/assets/emojis/${emoticons[2]}.svg`)" class="icon h5" :class="emoticons[2]" />
-                    <ion-radio slot="start" value='2'></ion-radio>
-                </ion-item>
-
-                <ion-item>
-                    <img :src="require(`@/assets/emojis/${emoticons[3]}.svg`)" class="icon h5" :class="emoticons[3]" />
-                    <ion-radio slot="start" value='3'></ion-radio>
-                </ion-item>
-
-                <ion-item>
-                    <img :src="require(`@/assets/emojis/${emoticons[4]}.svg`)" class="icon h5" :class="emoticons[4]" />
-                    <ion-radio slot="start" value='4'></ion-radio>
-                </ion-item>
-            </ion-radio-group>
-        </ion-list>
-
-        <ion-button expand="block" fill="outline" @click="closeModal">Submit</ion-button>
+        <ion-button expand="block" fill="solid" @click="closeModal">Submit</ion-button>
     </ion-content>
 </template>
 
@@ -73,8 +52,9 @@ export default {
         return modal.dismiss();
     },
 
-    changeSelection(event) {
-        this.mood = event.detail.value;
+    changeSelection(index) {
+        console.log(index);
+        this.mood = index;
     }
   }
 };
