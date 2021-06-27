@@ -17,7 +17,7 @@ var options = {
 };
 
 const db = mysql.createConnection({
-    host: DB_USERNAME,
+    host: DB_HOST,
     user: DB_USERNAME,
 	password: DB_PASSWORD,
 	database: DB_DATABASE,
@@ -29,6 +29,8 @@ var sessionStore = new MySQLStore(options);
 
 db.connect((err) => {
     if (err) {
+        console.log(DB_HOST);
+        console.log(DB_USERNAME)
         throw err;
     }
     console.log('mySQL Connected...')
@@ -364,10 +366,6 @@ app.get('/deletealarms', (req, res) => {
         console.log(result);
     });
 })
-
-app.get('*', function (request, response) {
-    response.sendFile(path.resolve(__dirname, 'index.html'));
-  });
 
 app.listen(port, () => {
     console.log('Server started on port: '+ port);
