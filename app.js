@@ -16,25 +16,39 @@ var options = {
 	createDatabaseTable: true,
 };
 
-const db = mysql.createConnection({
+const db_config = {
     host: DB_HOST,
     user: DB_USERNAME,
 	password: DB_PASSWORD,
 	database: DB_DATABASE,
     multipleStatements: true,
-    
-});
+};
 
-var sessionStore = new MySQLStore(options);
+var db;
 
-db.connect((err) => {
-    if (err) {
-        console.log(DB_HOST);
-        console.log(DB_USERNAME)
-        console.log(err);
+function handleDisconnect() {
+  db = mysql.createConnection(db_config); // Recreate the connection, since
+                                                  // the old one cannot be reused.
+
+  db.connect(function(err) {              // The server is either down
+    if(err) {                                     // or restarting (takes a while sometimes).
+      console.log('error when connecting to db:', err);
+      setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+    }                                     // to avoid a hot loop, and to allow our node script to
+  });                                     // process asynchronous requests in the meantime.
+                                          // If you're also serving http, display a 503 error.
+  db.on('error', function(err) {
+    console.log('db error', err);
+    if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+      handleDisconnect();                         // lost due to either server restart, or a
+    } else {                                      // connnection idle timeout (the wait_timeout
+      throw err;                                  // server variable configures this)
     }
-    console.log('mySQL Connected...')
-});
+  });
+}
+
+handleDisconnect();
+var sessionStore = new MySQLStore(options);
 
 
 const app = express();
