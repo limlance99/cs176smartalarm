@@ -35,6 +35,7 @@ export default {
   },
   methods: {
     changeDiff($event, clicked) {
+      if (!($event.target.value in ["Easy", "Medium", "Hard"])) return;
       this.$emit("changeDiff", $event.target.value, clicked);
       axios.get(`${SERVER_URL}/updatesettings/${this.userID}/${$event.target.value}`)
       .then(response => {
