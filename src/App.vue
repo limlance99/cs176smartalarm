@@ -15,12 +15,12 @@
 
         <ion-tab tab="statistics">
           <Header :header="'Statistics'" @getAlarms="getAlarms" :userID="userID"/>
-          <Statistics />
+          <Statistics :allStats="allStats" :weekStats="weekStats"/>
         </ion-tab>
 
         <ion-tab tab="settings">
           <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
-          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff"/>
+          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" :userID="userID"/>
         </ion-tab>
 
         <ion-tab-bar slot="bottom" style="padding-top:5px; padding-bottom:5px" :color="[isMorning ? 'secondary' : 'primary']">
@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      userID: 16,
+      userID: 39,
       isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
@@ -110,6 +110,8 @@ export default {
       intervalcheckAlarms: null,
       ringtone: new Audio(Pigstep),
       deferredPrompt: null,
+      allStats: [],
+      weekStats: []
     };
   },
   created() {
@@ -119,9 +121,10 @@ export default {
     axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
     .then(response => {
       // console.log("user current logged in: ",response.data);
-      this.userID = response.data.id != null ? response.data.id : 16;
+      this.userID = response.data.id != null ? response.data.id : 39;
       console.log("current user: ", this.userID);
       this.getAlarms();
+      this.getStats();
     });
 
 
@@ -134,8 +137,8 @@ export default {
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
       this.showInstallAlert();
-      //if user id isnt the default user ID, delete user and set user id to 16
-      if (this.userID != 16) {
+      //if user id isnt the default user ID, delete user and set user id to 39
+      if (this.userID != 39) {
         this.deleteUser(this.userID);
       }
 
@@ -265,12 +268,28 @@ export default {
         // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
     },
+
+    getStats() {
+      console.log("fetching stats from db");
+      axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
+      .then(response => {
+        console.log(response);
+        this.allStats = response.data;
+      });
+      axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
+      .then(response => {
+        console.log(response);
+        this.weekStats = response.data;
+      });
+      
+      
+    },
     deleteUser(userID) {
       console.log("deleting user from db: ", userID);
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
       .then(response => {
         console.log(response);
-        this.userID = 16;
+        this.userID = 39;
         this.getAlarms();
       });
     },
@@ -310,8 +329,10 @@ export default {
 
         if (willRing) {
           var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
-          this.$set(item, 'isActive', false);
-          this.$set(this.listOfAlarms, i, item);
+          // this.$set(item, 'isActive', false);
+          // this.$set(this.listOfAlarms, i, item);
+          this.toggleOne(i);
+          console.log("turn off alarm");
           clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(toPass);
         }
@@ -503,17 +524,20 @@ export default {
                 // Format wake up time
                 var hours = curDateTime.getHours();
                 var mins = curDateTime.getMinutes();
+                console.log("hello: ",hours, mins);
                 var ampm = (hours >= 12) ? 'PM' : 'AM';
 
                 if (mins >= 60) {
                   mins = mins % 60;
                   hours = hours + 1;
                 }
-                if (hours >= 12) hours = hours - 12;
+
+                // if (hours >= 12) hours = hours - 12;
                 if (hours < 10) hours = '0' + hours;
                 if (mins < 10) mins = '0' + mins;
                 
-                var wakeUpTime = hours + ':' + mins + ' ' + ampm;
+                // var wakeUpTime = hours + ':' + mins + ' ' + ampm;
+                var wakeUpTime = hours + ':' + mins + ':' + '00';
 
                 // Get number of snoozes
                 var snoozes = alarmTime.snoozes;
@@ -528,7 +552,24 @@ export default {
                 console.log("Wake Up Time: " +  wakeUpTime);
                 console.log("Mood: " + mood);
 
-                return true;
+                var statPost = {
+                  userID: this.userID,
+                  snoozes: snoozes,
+                  timeToWake: timeToWake,
+                  wakeUpTime: wakeUpTime,
+                  mood: mood
+                }
+                axios.post(`${SERVER_URL}/addstat`, {statPost})
+                .then(response => {
+                    console.log(response);
+                    if (response.status == 200){
+                        // this.getAlarms();
+                        console.log("updated stats");
+                        this.getStats();
+                        // getStats here
+                    }
+                });
+                return true; 
               },
             },
           ],

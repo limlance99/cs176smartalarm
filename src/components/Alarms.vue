@@ -4,7 +4,7 @@
       <ion-list-header>
         <ion-label> Alarms </ion-label>
       </ion-list-header> -->
-      <h5 v-if="alarms.length == 0" class="regularText"> You have no alarms. Add an alarm now. </h5>
+      <p v-if="alarms.length == 0" class="regularText"> You have no alarms. Add an alarm now. </p>
       <ion-item v-for="(alarm, key) in listOfAlarms" :key="key" lines="none">
         <ion-grid>
         <ion-row class="outerbox ion-margin-vertical" style="width:100%">
@@ -15,7 +15,7 @@
             </ion-col>
           </ion-col>
           <ion-col class="vertical-align-content" size="auto">
-            <ion-toggle :checked="alarm.isActive == 1"  :color="[isMorning ? 'secondary' : 'primary']"  @ionChange="toggleAlarm(key, $event)"></ion-toggle>
+            <ion-toggle :checked="alarm.isActive == 1"  :color="[isMorning ? 'secondary' : 'primary']"  @ionChange="toggleAlarm(key, $event)" mode="ios"></ion-toggle>
           </ion-col>
         </ion-row>
         </ion-grid>
