@@ -7,7 +7,7 @@
             <ion-row class="ion-margin-vertical">
                 <ion-col size="5">
                     <p class="span subtitleText" style="text-align:center"> Snoozes Per Day </p>
-                    <h5 class="regularText" style="text-align:center"> {{ aveSnoozes }} </h5>
+                    <h5 class="regularText" style="text-align:center"> {{ aveSnoozes}} </h5>
                 </ion-col>
 
                 <ion-col size="7">
@@ -21,7 +21,8 @@
                     <p class="span subtitleText" style="text-align:center"> Sleep Quality </p>
                     <!-- <h5 class="regularText" style="text-align:center"> {{ aveQuality}} </h5> -->
                     <div class="width:100%" style="text-align:center">
-                    <img :src="require(`@/assets/emojis/${emoticons[aveQuality]}.svg`)" class="icon h4" :class="emoticons[aveQuality]" style="height:50px; margin-top:15px" />
+                    <h5 v-if="allStatsLength == 0" class="regularText"> - </h5>
+                    <img v-else :src="require(`@/assets/emojis/${emoticons[aveQuality]}.svg`)" class="icon h4" :class="emoticons[aveQuality]" style="height:50px; margin-top:15px" />
                     </div>
                 </ion-col>
 
@@ -45,7 +46,7 @@
                     <p class="regularText span" style="text-align:right"> 7 days </p>
                 </ion-col>
             </ion-row>
-            
+            <div v-if="this.allStatsLength">
             <!-- <ion-row class="ion-margin-vertical"> -->
                 <line-chart v-if="graphToShow != 'sleepQuality'" :data="dataChart" :options="options"></line-chart>
                 <div v-else>
@@ -60,6 +61,8 @@
                         </ion-col>
                     </ion-row>
                 </div>
+            </div>
+            <p v-else class="subtitleText"> No stats to show </p>
             <!-- </ion-row> -->
 
 
@@ -72,7 +75,7 @@
                     <p class="span regularText" style="text-align:left"> Snoozes </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? this.allStats[allStatsLength-1].snoozes + ' times' : 'No Record'}}  </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStatsLength ? this.allStats[allStatsLength-1].snoozes + ' times' : 'No Record'}}  </p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -80,7 +83,7 @@
                     <p class="span regularText" style="text-align:left"> Time Taken to Wake </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? this.allStats[allStatsLength-1].timeToWake : 'No Record' }}</p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStatsLength ? this.allStats[allStatsLength-1].timeToWake : 'No Record' }}</p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -88,7 +91,7 @@
                     <p class="span regularText" style="text-align:left"> Wake Up Time </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? todayWake : 'No Record' }} </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStatsLength ? todayWake : 'No Record' }} </p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -96,7 +99,7 @@
                     <p class="span regularText" style="text-align:left"> Sleep Quality </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? word[this.allStats[allStatsLength-1].mood] : 'No Record'}} </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStatsLength ? word[this.allStats[allStatsLength-1].mood] : 'No Record'}} </p>
                 </ion-col>
             </ion-row>
         </ion-grid>
@@ -110,6 +113,11 @@ export default({
     components: {
         LineChart
     },
+    computed: {
+        todayWake() {
+            return moment(this.allStats[this.allStatsLength-1].wakeUpTime, 'HH:mm:ss').format('hh:mm A');
+        }
+    },
     props: ['allStats', 'weekStats'],
     data () {
       return {
@@ -120,22 +128,22 @@ export default({
         //
         graphToShow: "snoozes",
 
-        // placeholder 7-day data
-        snoozes: [1,2,3,4,5,6,7],
-        timeToWake: ['00:10:00', '00:10:00', '00:15:00', '00:05:00', '00:01:10', '00:05:30', '00:10:00'],
-        sleepQuality: [0, 1, 2, 3, 4, 2, 0],
-        wakeUpTime: ['10:10:00', '12:00:00', '13:01:30', '12:00:00', '12:00:00', '12:00:00', '12:00:00'],
+        // // placeholder 7-day data
+        // snoozes: [1,2,3,4,5,6,7],
+        // timeToWake: ['00:10:00', '00:10:00', '00:15:00', '00:05:00', '00:01:10', '00:05:30', '00:10:00'],
+        // sleepQuality: [0, 1, 2, 3, 4, 2, 0],
+        // wakeUpTime: ['10:10:00', '12:00:00', '13:01:30', '12:00:00', '12:00:00', '12:00:00', '12:00:00'],
 
-        //average values
-        aveSnoozes: 3.5,
-        aveTime: '00:20:00',
-        aveQuality: '0',
-        aveWake: '10:00 AM',
+        // //average values
+        // aveSnoozes: 3.5,
+        // aveTime: '00:20:00',
+        // aveQuality: '0',
+        // aveWake: '10:00 AM',
 
-        todaySnooze: 5,
-        todayTime: "10 min 30 sec",
-        todayWake: "10:30 AM",
-        todayQuality: "Good",
+        // todaySnooze: 5,
+        // todayTime: "10 min 30 sec",
+        // // todayWake: "10:30 AM",
+        // todayQuality: "Good",
 
         allStatsLength: 0,
         weekGraphData: {},
@@ -257,7 +265,7 @@ export default({
                 tempAnsTTW += moment(item.timeToWake, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
                 tempAnsWUT += moment(item.wakeUpTime, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
             }
-            this.aveSnoozes = tempAnsSnooze / this.allStatsLength;
+            this.aveSnoozes = this.allStatsLength ? tempAnsSnooze / this.allStatsLength : '-';
 
             tempAnsTTW = Math.floor(tempAnsTTW / this.allStatsLength);
             this.aveTime = this.allStatsLength ? (new Date(tempAnsTTW * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] : '-';
@@ -356,7 +364,7 @@ export default({
         allStats() {
             console.log("stats updated, getting new average");
             this.getAverageNumber();
-            this.todayWake = moment(this.allStats[this.allStatsLength-1].wakeUpTime, 'HH:mm:ss').format('hh:mm A');
+            // this.todayWake = moment(this.allStats[this.allStatsLength-1].wakeUpTime, 'HH:mm:ss').format('hh:mm A');
         },
         async weekStats() {
             console.log("week stats updated, getting new average");

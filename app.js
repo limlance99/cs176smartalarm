@@ -121,7 +121,7 @@ app.get('/createsettings', (req, res) => {
     //difficulty: 0- easy; 1- medium; 2-difficult
     //mode: 0-light; 1-dark
     let query = 'DROP TABLE IF EXISTS settings; '
-    query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty int, mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+    query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty VARCHAR(255), mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
             console.log(err);
@@ -241,7 +241,7 @@ app.get('/getstatistics', (req, res) => {
 });
 
 app.get('/getallstat/:userID', (req, res) => {
-    let sql = `SELECT * FROM statistics`;
+    let sql = `SELECT * FROM statistics WHERE userID = ${req.params.userID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -336,12 +336,13 @@ app.get('/getsessions', (req, res) => {
 });
 //UPDATE ITEM IN TABLES*************************************************************************************/
 app.get('/updatesettings/:userID/:newDifficulty', (req, res) => {
-    let sql = `UPDATE settings SET difficulty = ${req.params.newDifficulty} WHERE userID = ${req.params.id}`;
+    let sql = `UPDATE settings SET difficulty = '${req.params.newDifficulty}' WHERE userID = ${req.params.userID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
+            return;
         }
-        res.send("settings updated \n" + result);
+        res.send(200);
         console.log(result);
     });
 })

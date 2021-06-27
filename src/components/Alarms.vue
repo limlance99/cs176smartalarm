@@ -4,7 +4,7 @@
       <ion-list-header>
         <ion-label> Alarms </ion-label>
       </ion-list-header> -->
-      <h5 v-if="alarms.length == 0" class="regularText"> You have no alarms. Add an alarm now. </h5>
+      <p v-if="alarms.length == 0" class="regularText"> You have no alarms. Add an alarm now. </p>
       <ion-item v-for="(alarm, key) in listOfAlarms" :key="key" lines="none">
         <ion-grid>
         <ion-row class="outerbox ion-margin-vertical" style="width:100%">
