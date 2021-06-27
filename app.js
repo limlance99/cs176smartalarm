@@ -50,7 +50,6 @@ app.use(session({
 app.use(express.static("dist"));
 
 
-
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://cs176smartalarm.herokuapp.com/"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -365,6 +364,10 @@ app.get('/deletealarms', (req, res) => {
         console.log(result);
     });
 })
+
+app.get('*', function (request, response) {
+    response.sendFile(path.resolve(__dirname, 'index.html'));
+  });
 
 app.listen(port, () => {
     console.log('Server started on port: '+ port);
