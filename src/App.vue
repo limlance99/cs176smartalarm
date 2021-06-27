@@ -129,7 +129,7 @@ export default {
 
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      alert("beforeinstallprompt");
+      // alert("beforeinstallprompt");
 
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
@@ -150,7 +150,7 @@ export default {
       // Clear the deferredPrompt so it can be garbage collected
       this.deferredPrompt = null;
       // Optionally, send analytics event to indicate successful install
-      alert('PWA was installed');
+      // alert('PWA was installed');
       this.createUser();
 
     });
