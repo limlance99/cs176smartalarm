@@ -38,15 +38,14 @@ export default {
             if (data == null) {
                 return;
             }
-            this.$emit("pushToList", data);
-            // axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
-            // .then(response => {
-            //     console.log(response);
-            //     if (response.status == 200){
-            //         this.$emit("pushToList", data);
-            //         this.$emit("getAlarms");   
-            //     }
-            // });
+            axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
+            .then(response => {
+                console.log(response);
+                if (response.status == 200){
+                    this.$emit("pushToList", data);
+                    this.$emit("getAlarms");   
+                }
+            });
             
         },
     }
