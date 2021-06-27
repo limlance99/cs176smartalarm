@@ -15,7 +15,7 @@
             </ion-col>
           </ion-col>
           <ion-col class="vertical-align-content" size="auto">
-            <ion-toggle :checked="alarm.isActive == 1"  :color="[isMorning ? 'secondary' : 'primary']"  @ionChange="toggleAlarm(key, $event)"></ion-toggle>
+            <ion-toggle :checked="alarm.isActive == 1"  :color="[isMorning ? 'secondary' : 'primary']"  @ionChange="toggleAlarm(key, $event)" mode="ios"></ion-toggle>
           </ion-col>
         </ion-row>
         </ion-grid>

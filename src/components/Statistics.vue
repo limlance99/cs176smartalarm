@@ -34,7 +34,7 @@
 
             <ion-row style="margin-bottom: 10px">
                 <ion-col>
-                    <ion-select :value="graphToShow" @ionChange="onChange($event)" style="padding:2px" interface="popover" mode="ios" class="regularText">
+                    <ion-select :value="graphToShow" @ionChange="onChange($event, true)" style="padding:2px" interface="popover" mode="ios" class="regularText">
                         <ion-select-option value="snoozes">Snoozes</ion-select-option>
                         <ion-select-option value="timeToWake">Time Taken to Wake Up</ion-select-option>
                         <ion-select-option value="wakeUpTime">Wake Up Time</ion-select-option>
@@ -48,31 +48,31 @@
             
             <!-- <ion-row class="ion-margin-vertical"> -->
                 <line-chart v-if="graphToShow != 'sleepQuality'" :data="dataChart" :options="options"></line-chart>
-                <ion-row v-else>
-                    <ion-col v-for="(mood,index) in sleepQuality" :key="index">
-                        <!-- replace with icons -->
-                        <!-- <div class="mood-emoji" style="text-align:center;"> {{ emoticons[mood] }} </div> -->
-                        <img :src="require(`@/assets/emojis/${emoticons[mood]}.svg`)" class="icon h5" :class="emoticons[mood]" />
-                    </ion-col>
-                </ion-row>
-                <ion-row>
-                    <ion-col v-for="(day,index) in ['S', 'M', 'T', 'W', 'TH', 'F', 'S']" :key="index">
-                        <p class="span subtitleText" style="text-align:center"> {{ day }} </p>
-                    </ion-col>
-                </ion-row>
+                <div v-else>
+                    <ion-row>
+                        <ion-col v-for="(n,index) in 7" :key="index">
+                            <img v-if="weekGraphData.mood.length > index" :src="require(`@/assets/emojis/${emoticons[weekGraphData.mood[index]]}.svg`)" class="icon h5" :class="emoticons[weekGraphData.mood[index]]"/>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col v-for="(day,index) in ['S', 'M', 'T', 'W', 'TH', 'F', 'S']" :key="index">
+                            <p class="span subtitleText" style="text-align:center"> {{ day }} </p>
+                        </ion-col>
+                    </ion-row>
+                </div>
             <!-- </ion-row> -->
 
 
 
             <ion-row style="margin-top: 40px">
-                <span class="regularText"> Today </span>
+                <span class="regularText"> Most Recent </span>
             </ion-row>
             <ion-row class="ion-margin-vertical">
                 <ion-col>
                     <p class="span regularText" style="text-align:left"> Snoozes </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ todaySnooze }} times </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? this.allStats[allStatsLength-1].snoozes + ' times' : 'No Record'}}  </p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -80,7 +80,7 @@
                     <p class="span regularText" style="text-align:left"> Time Taken to Wake </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ todayTime }} </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? this.allStats[allStatsLength-1].timeToWake : 'No Record' }}</p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -88,7 +88,7 @@
                     <p class="span regularText" style="text-align:left"> Wake Up Time </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ todayWake }} </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? todayWake : 'No Record' }} </p>
                 </ion-col>
             </ion-row>
             <ion-row class="ion-margin-vertical">
@@ -96,7 +96,7 @@
                     <p class="span regularText" style="text-align:left"> Sleep Quality </p>
                 </ion-col>
                 <ion-col>
-                    <p class="span subtitleText" style="text-align:right"> {{ todayQuality }} </p>
+                    <p class="span subtitleText" style="text-align:right"> {{ this.allStats.length > 0 ? word[this.allStats[allStatsLength-1].mood] : 'No Record'}} </p>
                 </ion-col>
             </ion-row>
         </ion-grid>
@@ -110,11 +110,13 @@ export default({
     components: {
         LineChart
     },
+    props: ['allStats', 'weekStats'],
     data () {
       return {
         // can be props instead
         // emoticons: ['😠', '😞', '😐', '😀', '😂'],
         emoticons: [ "angry", "sad-tear", "meh", "smile", "grin-stars"], 
+        word: ['Very Bad', 'Bad', 'Neutral', 'Good', 'Very Good'],
         //
         graphToShow: "snoozes",
 
@@ -135,6 +137,10 @@ export default({
         todayWake: "10:30 AM",
         todayQuality: "Good",
 
+        allStatsLength: 0,
+        weekGraphData: {},
+        dataChart:[],
+
         // different yaxis confiugarions depending on data "type"
         timeY: [{
             type: 'linear',
@@ -146,7 +152,6 @@ export default({
             ticks: {
                 fontColor: 'rgba(255, 255, 255, 0.5)',
                 // min: moment('00:00:00', 'HH:mm:ss').diff(moment().startOf('day'), 'seconds'),
-                stepSize: 1800,
                 beginAtZero: false,
                 callback: value => {
                     // moment(tempAnswer, 'HH:mm:ss').format('hh:mm A')
@@ -230,9 +235,11 @@ export default({
         }
       }
     },
-    created() {
-        this.dataChart = [1,2,3,4,5,6,7]
+    async created() {
+        
         this.getAverageNumber();
+        await this.formatWeekData();
+        this.dataChart = this.weekGraphData.snoozes;
     },
     methods: {
         // call this also when new stats are added;
@@ -240,33 +247,48 @@ export default({
             // snoozes
             var item
             var tempAnswer = 0;
-            for (item of this.snoozes) {
-                tempAnswer += item;
-            }
-            this.aveSnoozes = tempAnswer / 7;
+            var tempAnsSnooze = 0;
+            var tempAnsTTW = 0;
+            var tempAnsWUT = 0;
 
-            // time to wake
-            tempAnswer = 0;
-            for (item of this.timeToWake) {
-                tempAnswer += moment(item, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
+            this.allStatsLength = this.allStats.length;
+            for (item of this.allStats) {
+                tempAnsSnooze += item.snoozes;
+                tempAnsTTW += moment(item.timeToWake, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
+                tempAnsWUT += moment(item.wakeUpTime, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
             }
-            tempAnswer = Math.floor(tempAnswer / 7);
-            this.aveTime = (new Date(tempAnswer * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
+            this.aveSnoozes = tempAnsSnooze / this.allStatsLength;
 
-            // wake up time
-            tempAnswer = 0;
-            for (item of this.wakeUpTime) {
-                tempAnswer += moment(item, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
-            }
-            tempAnswer = Math.floor(tempAnswer / 7);
-            tempAnswer = (new Date(tempAnswer * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
-            this.aveWake = moment(tempAnswer, 'HH:mm:ss').format('hh:mm A');
+            tempAnsTTW = Math.floor(tempAnsTTW / this.allStatsLength);
+            this.aveTime = this.allStatsLength ? (new Date(tempAnsTTW * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] : '-';
+
+            tempAnsWUT = Math.floor(tempAnsWUT / this.allStatsLength);
+            tempAnsWUT = this.allStatsLength ? (new Date(tempAnsWUT * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] :'-';
+            this.aveWake = this.allStatsLength ? moment(tempAnsWUT, 'HH:mm:ss').format('hh:mm A'): '-';
+            
+            // // time to wake
+            // tempAnswer = 0;
+            // for (item of this.allStats.timeToWake) {
+            //     tempAnswer += moment(item, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
+            // }
+            // tempAnswer = Math.floor(tempAnswer / 7);
+            // this.aveTime = (new Date(tempAnswer * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
+
+            // // wake up time
+            // tempAnswer = 0;
+            // for (item of this.allStats.this.wakeUpTime) {
+            //     tempAnswer += moment(item, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
+            // }
+            // tempAnswer = Math.floor(tempAnswer / 7);
+            // tempAnswer = (new Date(tempAnswer * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
+            // this.aveWake = moment(tempAnswer, 'HH:mm:ss').format('hh:mm A');
+
             // sleep quality
 
             var greatestFreq = 0;
             var count = 0
             for(item of [0,1,2,3,4,5]){
-                count = this.sleepQuality.filter((mood) => mood == item).length;
+                count = this.allStats.filter((stat) => stat.mood == item).length;
                 if(count > greatestFreq){
                     greatestFreq = count
                     tempAnswer = item;
@@ -275,27 +297,28 @@ export default({
             this.aveQuality = tempAnswer;
         },
 
-        onChange($event){
-            this.graphToShow = $event.target.value
+        onChange($event, clicked){
+            this.graphToShow = clicked ? $event.target.value : this.graphToShow;
             var temp;
             var i
             console.log("graph select changed", this.graphToShow);
+            console.log(this.weekGraphData);
             if (this.graphToShow == "snoozes") {
-                this.dataChart = this.snoozes;
+                this.dataChart = this.weekGraphData.snoozes;
                 this.$set(this.options.scales, 'yAxes', this.numY);
             }
             else if (this.graphToShow == "timeToWake") {        
-                temp = JSON.parse(JSON.stringify(this.timeToWake));
-                for (i in this.timeToWake) {
-                    this.$set(temp, i, moment(this.timeToWake[i], 'HH:mm:ss').diff(moment().startOf('day'), 'seconds'));
+                temp = JSON.parse(JSON.stringify(this.weekGraphData.timeToWake));
+                for (i in this.weekGraphData.timeToWake) {
+                    this.$set(temp, i, moment(this.weekGraphData.timeToWake[i], 'HH:mm:ss').diff(moment().startOf('day'), 'seconds'));
                 }
                 this.dataChart = temp;
                 this.$set(this.options.scales, 'yAxes', this.timeStampY);
             }
             else if (this.graphToShow == "wakeUpTime") {
-                temp = JSON.parse(JSON.stringify(this.wakeUpTime));
-                for (i in this.wakeUpTime) {
-                    this.$set(temp, i, moment(this.wakeUpTime[i], 'HH:mm:ss').diff(moment().startOf('day'), 'seconds'));
+                temp = JSON.parse(JSON.stringify(this.weekGraphData.wakeUpTime));
+                for (i in this.weekGraphData.wakeUpTime) {
+                    this.$set(temp, i, moment(this.weekGraphData.wakeUpTime[i], 'HH:mm:ss').diff(moment().startOf('day'), 'seconds'));
                 }
                 this.dataChart = temp;
                 this.$set(this.options.scales, 'yAxes', this.timeY);
@@ -304,12 +327,43 @@ export default({
             //     this.dataChart = [0,0,0,0,0,0,0];
             //     this.$set(this.options.scales, 'yAxes', this.noY);
             // }
+        },
+
+        formatWeekData() {
+            this.weekGraphData = {
+                snoozes: [],
+                timeToWake: [],
+                wakeUpTime: [],
+                mood:[]
+            };
+            for (var item of this.weekStats) {
+                if (item.dayOfWeek - 1 <= this.weekGraphData.snoozes.length - 1) { //repeat value (multiple entries in one day)
+                    this.$set(this.weekGraphData.snoozes,item.dayOfWeek-1, item.snoozes);
+                    this.$set(this.weekGraphData.timeToWake,item.dayOfWeek-1, item.timeToWake);
+                    this.$set(this.weekGraphData.wakeUpTime,item.dayOfWeek-1,item.wakeUpTime);
+                    this.$set(this.weekGraphData.mood,item.dayOfWeek-1,item.mood);
+                }
+                else {
+                    this.weekGraphData.snoozes.push(item.snoozes);
+                    this.weekGraphData.timeToWake.push(item.timeToWake);
+                    this.weekGraphData.wakeUpTime.push(item.wakeUpTime);
+                    this.weekGraphData.mood.push(item.mood);
+                }
+            }
         }
     },
     watch: {
-        // datacollection() {
-        //     console.log(this.datacollection.datasets[0])
-        // }
+        allStats() {
+            console.log("stats updated, getting new average");
+            this.getAverageNumber();
+            this.todayWake = moment(this.allStats[this.allStatsLength-1].wakeUpTime, 'HH:mm:ss').format('hh:mm A');
+        },
+        async weekStats() {
+            console.log("week stats updated, getting new average");
+            let res = await this.formatWeekData();
+            this.onChange('dummy', false);
+            // this.onChange('dummy', false);
+        }
     }
 })
 </script>

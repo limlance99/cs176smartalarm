@@ -15,7 +15,7 @@
 
         <ion-tab tab="statistics">
           <Header :header="'Statistics'" @getAlarms="getAlarms" :userID="userID"/>
-          <Statistics />
+          <Statistics :allStats="allStats" :weekStats="weekStats"/>
         </ion-tab>
 
         <ion-tab tab="settings">
@@ -275,14 +275,14 @@ export default {
       .then(response => {
         console.log(response);
         this.allStats = response.data;
-        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
       axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
       .then(response => {
         console.log(response);
         this.weekStats = response.data;
-        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
+      
+      
     },
     deleteUser(userID) {
       console.log("deleting user from db: ", userID);

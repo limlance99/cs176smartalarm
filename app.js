@@ -252,7 +252,7 @@ app.get('/getallstat/:userID', (req, res) => {
 });
 
 app.get('/getweekstat/:userID/', (req, res) => {
-    let sql = `SELECT * FROM statistics WHERE userID = ${req.params.userID} AND YEARWEEK(dateCreated) = YEARWEEK(CURDATE());`;
+    let sql = `SELECT *, DAYOFWEEK(dateCreated) as dayOfWeek FROM statistics WHERE userID = ${req.params.userID} AND YEARWEEK(dateCreated,0) = YEARWEEK(CURDATE(),0);`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             console.log(err);

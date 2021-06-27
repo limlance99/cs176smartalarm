@@ -225,7 +225,6 @@ ion-item {
 }
 
 
-
 /* Transparent standard */
 ion-toolbar {
   --background: transparent;
@@ -237,9 +236,6 @@ ion-tab-bar {
   --background: #22243F;
 }
 
-.header {
-  backdrop-filter: blur(6px) !important;
-}
 /* Remove bottom border on md */
 .header-md::after {
   background-image: none;
