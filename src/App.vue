@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      userID: 39,
+      userID: 5,
       isMorning: false,
       toolbarHeader: "Alarms",
       time: "",
@@ -121,7 +121,7 @@ export default {
     axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
     .then(response => {
       // console.log("user current logged in: ",response.data);
-      this.userID = response.data.id != null ? response.data.id : 39;
+      this.userID = response.data.id != null ? response.data.id : 5;
       console.log("current user: ", this.userID);
       this.getAlarms();
       this.getStats();
@@ -137,8 +137,8 @@ export default {
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
       this.showInstallAlert();
-      //if user id isnt the default user ID, delete user and set user id to 39
-      if (this.userID != 39) {
+      //if user id isnt the default user ID, delete user and set user id to 5
+      if (this.userID != 5) {
         this.deleteUser(this.userID);
       }
 
@@ -289,7 +289,7 @@ export default {
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
       .then(response => {
         console.log(response);
-        this.userID = 39;
+        this.userID = 5;
         this.getAlarms();
       });
     },
