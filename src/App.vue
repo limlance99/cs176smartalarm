@@ -110,6 +110,8 @@ export default {
       intervalcheckAlarms: null,
       ringtone: new Audio(Pigstep),
       deferredPrompt: null,
+      allStats: [],
+      weekStats: []
     };
   },
   created() {
@@ -122,6 +124,7 @@ export default {
       this.userID = response.data.id != null ? response.data.id : 16;
       console.log("current user: ", this.userID);
       this.getAlarms();
+      this.getStats();
     });
 
 
@@ -265,6 +268,22 @@ export default {
         // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
     },
+
+    getStats() {
+      console.log("fetching stats from db");
+      axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
+      .then(response => {
+        console.log(response);
+        this.allStats = response.data;
+        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
+      });
+      axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
+      .then(response => {
+        console.log(response);
+        this.weekStats = response.data;
+        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
+      });
+    },
     deleteUser(userID) {
       console.log("deleting user from db: ", userID);
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
@@ -297,8 +316,10 @@ export default {
         if (item.isActive == false) continue;
         if (item.time == time && item.ampm == amOrpm) {
           var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
-          this.$set(item, 'isActive', false);
-          this.$set(this.listOfAlarms, i, item);
+          // this.$set(item, 'isActive', false);
+          // this.$set(this.listOfAlarms, i, item);
+          this.toggleOne(i);
+          console.log("turn off alarm");
           clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(toPass);
         }
@@ -490,17 +511,20 @@ export default {
                 // Format wake up time
                 var hours = curDateTime.getHours();
                 var mins = curDateTime.getMinutes();
+                console.log("hello: ",hours, mins);
                 var ampm = (hours >= 12) ? 'PM' : 'AM';
 
                 if (mins >= 60) {
                   mins = mins % 60;
                   hours = hours + 1;
                 }
-                if (hours >= 12) hours = hours - 12;
+
+                // if (hours >= 12) hours = hours - 12;
                 if (hours < 10) hours = '0' + hours;
                 if (mins < 10) mins = '0' + mins;
                 
-                var wakeUpTime = hours + ':' + mins + ' ' + ampm;
+                // var wakeUpTime = hours + ':' + mins + ' ' + ampm;
+                var wakeUpTime = hours + ':' + mins + ':' + '00';
 
                 // Get number of snoozes
                 var snoozes = alarmTime.snoozes;
@@ -515,7 +539,24 @@ export default {
                 console.log("Wake Up Time: " +  wakeUpTime);
                 console.log("Mood: " + mood);
 
-                return true;
+                var statPost = {
+                  userID: this.userID,
+                  snoozes: snoozes,
+                  timeToWake: timeToWake,
+                  wakeUpTime: wakeUpTime,
+                  mood: mood
+                }
+                axios.post(`${SERVER_URL}/addstat`, {statPost})
+                .then(response => {
+                    console.log(response);
+                    if (response.status == 200){
+                        // this.getAlarms();
+                        console.log("updated stats");
+                        this.getStats();
+                        // getStats here
+                    }
+                });
+                return true; 
               },
             },
           ],
