@@ -53,7 +53,6 @@ export default {
     },
 
     changeSelection(index) {
-        console.log(index);
         this.mood = index;
     }
   }
