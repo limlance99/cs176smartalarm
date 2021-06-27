@@ -225,7 +225,6 @@ ion-item {
 }
 
 
-
 /* Transparent standard */
 ion-toolbar {
   --background: transparent;
@@ -237,9 +236,6 @@ ion-tab-bar {
   --background: #22243F;
 }
 
-.header {
-  backdrop-filter: blur(6px) !important;
-}
 /* Remove bottom border on md */
 .header-md::after {
   background-image: none;
@@ -317,6 +313,11 @@ ion-tab-button {
 .grin-stars {
  filter: invert(95%) sepia(54%) saturate(2226%) hue-rotate(142deg) brightness(81%) contrast(82%);
  opacity: 0.8;
+}
+
+.white-icon {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
+  opacity: 0.8;
 }
 
 .temp {

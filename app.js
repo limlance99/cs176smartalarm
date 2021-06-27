@@ -43,9 +43,9 @@ app.use(session({
 
 app.use(express.static("dist"));
 
-
+const REQUEST_URL = DB_HOST == 'localhost' ? "http://localhost:8080" : "https://cs176smartalarm.herokuapp.com/"
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://cs176smartalarm.herokuapp.com/"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", REQUEST_URL); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header('Access-Control-Allow-Credentials', true)
     next();
@@ -99,7 +99,7 @@ app.get('/createsettings', (req, res) => {
     //difficulty: 0- easy; 1- medium; 2-difficult
     //mode: 0-light; 1-dark
     let query = 'DROP TABLE IF EXISTS settings; '
-    query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty int, mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+    query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty VARCHAR(255), mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
             console.log(err);
@@ -112,7 +112,7 @@ app.get('/createsettings', (req, res) => {
 app.get('/createstatistics', (req, res) => {
     //dateTime contains date and wake up time
     let query = 'DROP TABLE IF EXISTS statistics; '
-    query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), sleepQuality int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+    query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), mood int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
             console.log(err);
@@ -169,9 +169,10 @@ app.post('/addalarm/:userID/', (req, res) => {
     });
 });
 
-app.get('/addstatistic/:statistic', (req, res) => {
+app.post('/addstat/', (req, res) => {
     // generates random strings for username and pass; doesn't matter if not unique
-    let post = req.params.statistic
+    console.log(req.body.statPost);
+    let post = req.body.statPost
     let sql = 'INSERT INTO statistics SET ?';
     let query = db.query(sql, post, (err, result) => {
         if (err) {
@@ -217,8 +218,19 @@ app.get('/getstatistics', (req, res) => {
     });
 });
 
-app.get('/getstatistics/:userID/', (req, res) => {
-    let sql = `SELECT * FROM statistics WHERE userID = ${req.params.userID} AND datetime >= NOW() - INTERVAL 7 DAY ORDER BY datetime ASC;`;
+app.get('/getallstat/:userID', (req, res) => {
+    let sql = `SELECT * FROM statistics WHERE userID = ${req.params.userID}`;
+    let query = db.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        res.send(result);
+        console.log(result);
+    });
+});
+
+app.get('/getweekstat/:userID/', (req, res) => {
+    let sql = `SELECT *, DAYOFWEEK(dateCreated) as dayOfWeek FROM statistics WHERE userID = ${req.params.userID} AND YEARWEEK(dateCreated,0) = YEARWEEK(CURDATE(),0);`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -302,12 +314,13 @@ app.get('/getsessions', (req, res) => {
 });
 //UPDATE ITEM IN TABLES*************************************************************************************/
 app.get('/updatesettings/:userID/:newDifficulty', (req, res) => {
-    let sql = `UPDATE settings SET difficulty = ${req.params.newDifficulty} WHERE userID = ${req.params.id}`;
+    let sql = `UPDATE settings SET difficulty = '${req.params.newDifficulty}' WHERE userID = ${req.params.userID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
+            return;
         }
-        res.send("settings updated \n" + result);
+        res.send(200);
         console.log(result);
     });
 })

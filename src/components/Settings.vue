@@ -1,36 +1,60 @@
 <template>
   <ion-content fullscreen class="ion-padding">
-      <ion-list-header>
-        <ion-label> Settings </ion-label>
-      </ion-list-header>
-
-      <ion-item>
-        <ion-label>Difficulty</ion-label>
-        <ion-select :placeholder="difficulty" v-on:ionChange="changeDiff" interface="popover"> 
-          <ion-select-option value="Easy">Easy</ion-select-option>
-          <ion-select-option value="Medium">Medium</ion-select-option>
-          <ion-select-option value="Hard">Hard</ion-select-option>
-        </ion-select>
-      </ion-item>
+      <ion-row>
+        <ion-col class="vertical-align-content">
+          <span class="regularText">Difficulty</span>
+        </ion-col>
+        <ion-col size="3">
+          <ion-select :value="currDifficulty" @ionChange="changeDiff($event,true)" interface="popover" class="regularText" style="text-align:right"> 
+            <ion-select-option value="Easy">Easy</ion-select-option>
+            <ion-select-option value="Medium">Medium</ion-select-option>
+            <ion-select-option value="Hard">Hard</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
     <!-- </ion-list> -->
   </ion-content>
 </template>
 
 <script>
+import axios from 'axios';
+import { SERVER_URL } from "../../config.js"
+
+
 export default {
   name: "Settings",
-  props: ["difficulty"],
+  props: ["difficulty", "userID"],
   data() {
     return {
       diffs: ["Easy", "Medium", "Hard"],
+      currDifficulty: "",
     };
   },
+  created() {
+    this.getSettings();
+  },
   methods: {
-    changeDiff(val) {
-      this.$emit("changeDiff", val.detail.value);
-      this.showSuccessToast(
-        `Difficulty successfully changed to ${val.detail.value}.`
-      );
+    changeDiff($event, clicked) {
+      this.$emit("changeDiff", $event.target.value, clicked);
+      axios.get(`${SERVER_URL}/updatesettings/${this.userID}/${$event.target.value}`)
+      .then(response => {
+        if (response.status == 200) {
+            this.showSuccessToast(
+              `Difficulty successfully changed to ${$event.target.value}.`
+            );
+            this.getSettings();
+        }
+      });
+    },
+    getSettings() {
+      console.log("getting settings");
+      axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
+      .then(response => {
+        if (response.status == 200) {
+            this.currDifficulty = response.data[0].difficulty;
+        }
+      });
+      
     },
     async showSuccessToast(data) {
       const toast = await this.$ionic.toastController.create({
