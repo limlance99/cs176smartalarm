@@ -9,7 +9,7 @@
                 <ion-icon name="add">
                 </ion-icon>
             </ion-button>
-            <span v-if="header=='Clock'" slot="end" style="font-size:12px; margin-right:10px;" @click="$emit('toggleAlarm');"> Test Alarm </span>
+            <!-- <span v-if="header=='Clock'" slot="end" style="font-size:12px; margin-right:10px;" @click="$emit('toggleAlarm');"> Test Alarm </span> -->
         </ion-toolbar>
     </ion-header>
 </template>
