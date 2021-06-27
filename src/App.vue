@@ -102,8 +102,8 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "02:07", ampm: "AM", isActive: true, repetitions: [{day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true}] },
-        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'M', isActive: false},{day: 'M', isActive: true},{day: 'M', isActive: false}] },
+        { time: "02:07", ampm: "AM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true},] },
+        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: false}, {day: 'T', isActive: true}, {day: 'W', isActive: false},] },
       ],
       hiddenAlarms: [],
       intervalcheckTime: null,
@@ -296,6 +296,7 @@ export default {
     checkAlarms() {
       var length = this.listOfAlarms.length;
       var cd = new Date();
+      var day = cd.getDay();
       var hour = cd.getHours();
       var mins = this.zeroPadding(cd.getMinutes(), 2);
       var amOrpm;
@@ -314,7 +315,19 @@ export default {
       for (let i = 0; i < length; ++i) {
         let item = Object.assign({}, this.listOfAlarms[i]);
         if (item.isActive == false) continue;
-        if (item.time == time && item.ampm == amOrpm) {
+
+        var activeDays = []
+        for (let i = 0; i < item.repetitions.length; ++i) {
+          if (item.repetitions[i].isActive) 
+            activeDays.push(i);
+        } 
+
+        var hasSetDay = activeDays.length > 0;
+        var willRing = (hasSetDay) ? 
+          item.time == time && item.ampm == amOrpm && activeDays.includes(day) :
+          item.time == time && item.ampm == amOrpm;
+
+        if (willRing) {
           var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
           // this.$set(item, 'isActive', false);
           // this.$set(this.listOfAlarms, i, item);
