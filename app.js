@@ -31,7 +31,7 @@ db.connect((err) => {
     if (err) {
         console.log(DB_HOST);
         console.log(DB_USERNAME)
-        throw err;
+        console.log(err);
     }
     console.log('mySQL Connected...')
 });
@@ -71,7 +71,7 @@ app.get('/createdb', (req, res) => {
     let query = 'CREATE DATABASE smartalarm';
     db.query(query, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('database created');
         // console.log(result);
@@ -84,7 +84,7 @@ app.get('/createusers', (req, res) => {
     query += 'CREATE TABLE users(id int AUTO_INCREMENT, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY (id))';
     db.query(query, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('users table created');
         // console.log(result);
@@ -96,7 +96,7 @@ app.get('/createalarms', (req, res) => {
     query += 'CREATE TABLE alarms(id int AUTO_INCREMENT, userID int, time VARCHAR(255), isActive BOOL, repetitions VARCHAR(255), ampm VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('alarms table created');
         // console.log(result);
@@ -110,7 +110,7 @@ app.get('/createsettings', (req, res) => {
     query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty int, mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('settings table created');
         // console.log(result);
@@ -123,7 +123,7 @@ app.get('/createstatistics', (req, res) => {
     query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), sleepQuality int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
     db.query(query, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('statistics table created');
         // console.log(result);
@@ -137,7 +137,7 @@ app.get('/adduser', (req, res) => {
     let sql = 'INSERT INTO users SET ?';
     let query = db.query(sql, post, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send({id: result.insertId});
         console.log('user added');
@@ -151,7 +151,7 @@ app.get('/adduser', (req, res) => {
         console.log(post2);
         let query2 = db.query(sql2, post2, (err, result) => {
             if (err) {
-                throw err;
+                console.log(err);
             }
             console.log('settings for user added');
             // res.send('settings added');
@@ -170,7 +170,7 @@ app.post('/addalarm/:userID/', (req, res) => {
     let sql = 'INSERT INTO alarms SET ?';
     let query = db.query(sql, alarmPost, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(200);
         console.log(result.insertId);
@@ -183,7 +183,7 @@ app.get('/addstatistic/:statistic', (req, res) => {
     let sql = 'INSERT INTO statistics SET ?';
     let query = db.query(sql, post, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(200);
         console.log(result);
@@ -196,7 +196,7 @@ app.get('/getusers', (req, res) => {
     let sql = 'SELECT * FROM users';
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         // console.log(result);
@@ -207,7 +207,7 @@ app.get('/getuser/:userID', (req, res) => {
     let sql = `SELECT * FROM users WHERE id = ${req.params.userID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         console.log(result);
@@ -218,7 +218,7 @@ app.get('/getstatistics', (req, res) => {
     let sql = `SELECT * FROM statistics`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         console.log(result);
@@ -229,7 +229,7 @@ app.get('/getstatistics/:userID/', (req, res) => {
     let sql = `SELECT * FROM statistics WHERE userID = ${req.params.userID} AND datetime >= NOW() - INTERVAL 7 DAY ORDER BY datetime ASC;`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         console.log(result);
@@ -240,7 +240,7 @@ app.get('/getsettings', (req, res) => {
     let sql = `SELECT * FROM settings`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         console.log(result);
@@ -251,7 +251,7 @@ app.get('/getsetting/:userID', (req, res) => {
     let sql = `SELECT * FROM settings WHERE userId = ${req.params.userID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         console.log(result);
@@ -263,7 +263,7 @@ app.get('/getalarms/:userID', (req, res) => {
         let sql = `SELECT * FROM alarms WHERE userId = ${req.params.userID}`;
         let query = db.query(sql, async (err, result) => {
             if (err) {
-                throw err;
+                console.log(err);
             }
             res.send(await printFiles(result));
             // res.send(result.forEach((item) => JSON.parse(item.repetitions)));
@@ -302,7 +302,7 @@ app.get('/getsessions', (req, res) => {
     let sql = `SELECT * FROM sessions`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send(result);
         
@@ -313,7 +313,7 @@ app.get('/updatesettings/:userID/:newDifficulty', (req, res) => {
     let sql = `UPDATE settings SET difficulty = ${req.params.newDifficulty} WHERE userID = ${req.params.id}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send("settings updated \n" + result);
         console.log(result);
@@ -324,7 +324,7 @@ app.post('/togglealarm/:alarmID', (req, res) => {
     let sql = `UPDATE alarms SET isActive = ${req.body.isActive} WHERE id = ${req.params.alarmID}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send("alarm updated \n" + result);
         console.log(result);
@@ -337,7 +337,7 @@ app.get('/deletealarm/:id', (req, res) => {
     let sql = `DELETE FROM alarms WHERE id = ${req.params.id}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('alarm deleted');
         console.log(result);
@@ -349,7 +349,7 @@ app.get('/deleteuser/:id', (req, res) => {
     let sql = `DELETE FROM users WHERE id = ${req.params.id}`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('user deleted'); 
         console.log(result);
@@ -360,7 +360,7 @@ app.get('/deletealarms', (req, res) => {
     let sql = `DELETE FROM alarms`;
     let query = db.query(sql, (err, result) => {
         if (err) {
-            throw err;
+            console.log(err);
         }
         res.send('alarms deleted'); 
         console.log(result);
