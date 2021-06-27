@@ -4,7 +4,7 @@
         <div>
             <ion-card-content text-center>
                 <h4 class="regularText"> {{ampm}} </h4>
-                <h1 class="regularText"> {{time.substring(0,2)}} <blink>:</blink> {{time.substring(3,5)}} </h1>
+                <h1 class="regularText"> {{time.substring(0,2)}} <span class="blink">:</span> {{time.substring(3,5)}} </h1>
                 <p class="regularText"> {{date}} </p>
             </ion-card-content>
         </div>
@@ -30,7 +30,7 @@ export default {
   height: 100%;
 }
 
-blink {
+.blink {
   -webkit-animation: 1s linear infinite condemned_blink_effect; /* for Safari 4.0 - 8.0 */
   animation: 1s linear infinite condemned_blink_effect;
 }

@@ -88,6 +88,11 @@ $light-background: linear-gradient(200deg, #90a6e4, #eeaccc);
   }
 }
 
+.mood-emoji {
+  line-height: 7vw;
+  font-size: 7vw;
+  margin-bottom: .25rem;
+}
 // .headerText {
 //   color: #B22E82 !important;
 // }
@@ -101,6 +106,9 @@ $light-background: linear-gradient(200deg, #90a6e4, #eeaccc);
   color: #FFFEFF !important;
 }
 
+.subtitleText {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
 
 h1 {
   font-size:91.55px !important;
@@ -156,6 +164,12 @@ p {
 
 .p {
   font-size: 23.20px !important;
+}
+
+.span {
+  font-size: 15.0px !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 .alert-message .no-margin {
   margin: 0px !important;
@@ -216,15 +230,20 @@ ion-item {
 ion-toolbar {
   --background: transparent;
   --ion-color-base: transparent !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 ion-tab-bar {
   --background: #22243F;
 }
 
+.header {
+  backdrop-filter: blur(6px) !important;
+}
 /* Remove bottom border on md */
 .header-md::after {
   background-image: none;
+
 }
 
 /* Remove bottom border on ios */
@@ -275,7 +294,34 @@ ion-tab-button {
   --color-selected: #FFFEFF !important;
 } 
 
+.angry {
+  filter: invert(55%) sepia(32%) saturate(5488%) hue-rotate(316deg) brightness(112%) contrast(100%);
+  opacity: 0.8;
+}
 
+.sad-tear {
+  filter: invert(58%) sepia(9%) saturate(4667%) hue-rotate(169deg) brightness(98%) contrast(87%);
+  opacity: 0.8;
+}
+
+.meh {
+  filter: invert(86%) sepia(11%) saturate(69%) hue-rotate(182deg) brightness(92%) contrast(95%);
+  opacity: 0.8;
+}
+
+.smile {
+  filter: invert(98%) sepia(64%) saturate(2531%) hue-rotate(314deg) brightness(103%) contrast(103%);
+  opacity: 0.8;
+}
+
+.grin-stars {
+ filter: invert(95%) sepia(54%) saturate(2226%) hue-rotate(142deg) brightness(81%) contrast(82%);
+ opacity: 0.8;
+}
+
+.temp {
+color: #4bc0c0
+}
 
 // ion-tab-bar  {
 //   border-top-left-radius: 5px;

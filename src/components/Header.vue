@@ -2,7 +2,7 @@
     <ion-header no-border>
         <ion-toolbar mode="ios" style="height:67.2px" class="vertical-align-content">
             <ion-title>
-                <h6 class="headerText"> {{header}} </h6>
+                <h6 :class="[[isMorning ? '' : 'dark'], 'headerText']"> {{header}} </h6>
             </ion-title>
 
             <ion-button no-padding :color="[isMorning ? 'secondary' : 'primary']" fill="clear" v-if="header=='Alarms'" slot="end" style="margin-right:10px; font-size:24px; font-weight:100" @click="openModal">
@@ -18,9 +18,10 @@
 // import { IonButton, IonContent, IonPage, modalController } from '@ionic/vue';
 // import modalController from '@ionic/vue';
 import AddAlarm from './AddAlarm.vue';
-
+import { SERVER_URL } from "../../config.js"
+import axios from "axios"
 export default {
-    props: ["header", "isMorning"],
+    props: ["header", "isMorning", "userID"],
     methods: {
         async openModal() {
             const modal = await this.$ionic.modalController
@@ -38,6 +39,15 @@ export default {
                 return;
             }
             this.$emit("pushToList", data);
+            // axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
+            // .then(response => {
+            //     console.log(response);
+            //     if (response.status == 200){
+            //         this.$emit("pushToList", data);
+            //         this.$emit("getAlarms");   
+            //     }
+            // });
+            
         },
     }
 }

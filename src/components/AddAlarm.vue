@@ -11,8 +11,8 @@
               </ion-button>
             </ion-col>
             <ion-col class="vertical-align-content">
-              <ion-title style="padding-left:10px">
-                  <h6 class="headerText ion-text-center" style="margin:0"> Add Alarm </h6>
+              <ion-title style="padding:0px">
+                  <h6 :class="[isMorning ? '' : 'dark']" class='headerText ion-text-center'  style="margin:0; width:100%"> Add Alarm </h6>
               </ion-title>
             </ion-col>
             <ion-col size="auto" class="vertical-align-content"> 
@@ -130,6 +130,12 @@ export default {
       async closeModal() {
         let t = this.wibba.split(' ')[0];
         let ap = this.wibba.split(' ')[1];
+        let repeats = []
+        for (var i of this.repetitions) {
+          if (i.isActive) {
+            repeats.push(i.day);
+          }
+        }
         let thing = { time: t, ampm: ap, isActive: true, repetitions: this.repetitions};
 
         const modal = await this.$ionic.modalController;
