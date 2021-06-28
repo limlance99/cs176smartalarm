@@ -43,12 +43,12 @@ app.use(session({
     saveUninitialized: false,// if we have not modified the session, we dont want it to save
     cookie: {
         secure: false,
-        originalMaxAge: 30 * 24 * 60 * 60 * 1000,
+        // originalMaxAge: 30 * 24 * 60 * 60 * 1000,
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        expires: 30 * 24 * 60 * 60 * 1000
+        // expires: 30 * 24 * 60 * 60 * 1000
     },
-    expires: new Date(Date.now() + (30 * 86400 * 1000)),
-    maxAge: Date.now() + (30 * 86400 * 1000)
+    // expires: new Date(Date.now() + (30 * 86400 * 1000)),
+    // maxAge: Date.now() + (30 * 86400 * 1000)
     
 }));
 
@@ -61,6 +61,7 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true)
     next();
 });
+
 
 //called when App.vue is created
 app.get("/login", (req,res) => {
