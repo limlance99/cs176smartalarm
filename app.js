@@ -15,7 +15,7 @@ var options = {
     client: sqLitedb, 
     expired: {
         clear: true,
-        intervalMs: 30 * 24 * 60 * 60 * 1000 //ms = 15min
+        intervalMs: 24 * 60 * 60 * 1000 //ms = 15min
     }
 };
 
