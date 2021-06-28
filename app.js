@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const session = require('express-session');
 const sqlite = require("better-sqlite3"); 
 const SqliteStore = require("better-sqlite3-session-store")(session);
-const sqLitedb = new sqlite("sessions.db", { verbose: console.log });
+const sqLitedb = new sqlite("sessions.db");
 
 const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE} = require('./config');
 
