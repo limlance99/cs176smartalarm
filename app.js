@@ -151,7 +151,7 @@ app.get('/adduser', (req, res) => {
         // res.cookie('id', result.insertId, { maxAge: 900000, httpOnly: true });
         // console.log(req.cookies);
         let sql2 = 'INSERT INTO settings SET ?'
-        let post2 = {userID: result.insertId, difficulty: 0, mode: 0}
+        let post2 = {userID: result.insertId, difficulty: 'Easy', mode: 0}
         console.log(post2);
         let query2 = db.query(sql2, post2, (err, result) => {
             if (err) {
