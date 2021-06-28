@@ -112,10 +112,7 @@ export default {
       deferredPrompt: null,
       allStats: [],
       weekStats: [],
-<<<<<<< HEAD
-=======
       rangToday : [],
->>>>>>> d740cd8e04e1d3a46dcb261f9e0522773876d5ab
     };
   },
   created() {
@@ -286,11 +283,11 @@ export default {
       
     },
     getSettings() {
-      console.log("getting settings from db");
+      // console.log("getting settings from db");
       axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
       .then(response => {
         if (response.status == 200) {
-          console.log(response);
+          // console.log(response);
           this.currentDiff = response.data[0].difficulty;
         }
       });

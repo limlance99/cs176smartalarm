@@ -49,7 +49,6 @@ export default {
         }
       });
     },
-<<<<<<< HEAD
     // getSettings() {
     //   console.log("getting settings from db");
     //   axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
@@ -59,18 +58,6 @@ export default {
     //     }
     //   });
     // },
-=======
-    getSettings() {
-      // console.log("getting settings from db");
-      axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
-      .then(response => {
-        if (response.status == 200) {
-            this.currDifficulty = response.data[0].difficulty;
-        }
-      });
-      
-    },
->>>>>>> d740cd8e04e1d3a46dcb261f9e0522773876d5ab
     async showSuccessToast(data) {
       const toast = await this.$ionic.toastController.create({
         message: data,
