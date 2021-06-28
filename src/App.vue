@@ -122,7 +122,7 @@ export default {
     .then(response => {
       // console.log("user current logged in: ",response.data);
       this.userID = response.data.id != null ? response.data.id : 5;
-      console.log("current user: ", this.userID);
+      // console.log("current user: ", this.userID);
       this.getAlarms();
       this.getStats();
     });
@@ -196,7 +196,7 @@ export default {
       await alert.present();
 
       const { role } = await alert.onDidDismiss();
-      console.log('onDidDismiss resolved with role', role);
+      // console.log('onDidDismiss resolved with role', role);
     },
     startAlarmChecker() {
       // console.log("start again");
@@ -218,7 +218,6 @@ export default {
     },
     deleteAlarm(key) {
       this.listOfAlarms.splice(key, 1);
-      console.log("lmaio");
     },
     convertTime12to24(data) {
             let {time, ampm} = data;
@@ -240,30 +239,28 @@ export default {
       this.$set(this.listOfAlarms, key, item);
       axios.post(`${SERVER_URL}/togglealarm/${this.listOfAlarms[key].id}`, {isActive: this.listOfAlarms[key].isActive})
       .then(response => {
-          console.log(response);
+          // console.log(response);
           if (response.status == 200){
               this.getAlarms();
           }
       });
     },
     createUser() {
-      console.log('CREATING USER');
+      console.log('Creating User');
       axios.get(`${SERVER_URL}/adduser`)
       .then(response => {
-        console.log(response);
         if (response.status == 200) {
-          alert('created new user with ID:', response.data.id);
+          // alert('created new user with ID:', response.data.id);
           this.userID = response.data.id;
-          console.log(this.userID, response.data.id);
+          console.log(this.userID);
           this.getAlarms();
         }
       });
     },
     getAlarms() {
-      console.log("HOY");
+      console.log("fetching alarms from db");
       axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
       .then(response => {
-        console.log(response);
         this.listOfAlarms = response.data;
         // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
       });
@@ -273,12 +270,10 @@ export default {
       console.log("fetching stats from db");
       axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
       .then(response => {
-        console.log(response);
         this.allStats = response.data;
       });
       axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
       .then(response => {
-        console.log(response);
         this.weekStats = response.data;
       });
       
@@ -288,7 +283,6 @@ export default {
       console.log("deleting user from db: ", userID);
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
       .then(response => {
-        console.log(response);
         this.userID = 5;
         this.getAlarms();
       });
@@ -332,7 +326,6 @@ export default {
           // this.$set(item, 'isActive', false);
           // this.$set(this.listOfAlarms, i, item);
           this.toggleOne(i);
-          console.log("turn off alarm");
           clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(toPass);
         }
@@ -524,8 +517,7 @@ export default {
                 // Format wake up time
                 var hours = curDateTime.getHours();
                 var mins = curDateTime.getMinutes();
-                console.log("hello: ",hours, mins);
-                var ampm = (hours >= 12) ? 'PM' : 'AM';
+                // var ampm = (hours >= 12) ? 'PM' : 'AM';
 
                 if (mins >= 60) {
                   mins = mins % 60;
@@ -546,11 +538,11 @@ export default {
                 var mood = await this.openMoodPicker();
 
                 // Hi Gene, this is for you :P
-                console.log("Statistical Data Stuff");
-                console.log("Snoozes : " + snoozes);
-                console.log("Time To Wake: " + timeToWake);
-                console.log("Wake Up Time: " +  wakeUpTime);
-                console.log("Mood: " + mood);
+                // console.log("Statistical Data Stuff");
+                // console.log("Snoozes : " + snoozes);
+                // console.log("Time To Wake: " + timeToWake);
+                // console.log("Wake Up Time: " +  wakeUpTime);
+                // console.log("Mood: " + mood);
 
                 var statPost = {
                   userID: this.userID,
@@ -559,12 +551,12 @@ export default {
                   wakeUpTime: wakeUpTime,
                   mood: mood
                 }
+                console.log("adding statistics to db");
                 axios.post(`${SERVER_URL}/addstat`, {statPost})
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     if (response.status == 200){
                         // this.getAlarms();
-                        console.log("updated stats");
                         this.getStats();
                         // getStats here
                     }

@@ -12,8 +12,11 @@ var options = {
 	user: DB_USERNAME,
 	password: DB_PASSWORD,
 	database: DB_DATABASE,
-    expiration: 86400000,
+    expiration: 30 * 24 * 60 * 60 * 1000, //86400000,
 	createDatabaseTable: true,
+    clearExpired: true,
+	// How frequently expired sessions will be cleared; milliseconds:
+	checkExpirationInterval: 24 * 60 * 60 * 1000,
 };
 
 const db_config = {
@@ -38,6 +41,10 @@ app.use(session({
     store: sessionStore,
     resave: false, // for every request to the server, dont create new session
     saveUninitialized: false,// if we have not modified the session, we dont want it to save
+    cookie: {
+        originalMaxAge: 30 * 24 * 60 * 60 * 1000,
+        expires: 30 * 24 * 60 * 60 * 1000
+    },
     
 }));
 
@@ -54,6 +61,12 @@ app.use(function(req, res, next) {
 //called when App.vue is created
 app.get("/login", (req,res) => {
     req.session.isAuth = true;
+    // if no user on current session, it means its the default user, so hardcode it; to ensure that only one session gets created for default user
+    if (req.session.user == null) {
+        req.session.user = 5;
+        req.session.isLoggedIn = true;
+        req.session.save();
+    }
     console.log('User opened app:' + req.session.user);
     res.send({id: req.session.user});
 })

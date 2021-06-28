@@ -8,3 +8,7 @@ ON DELETE CASCADE);
 
 CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), mood int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) 
 ON DELETE CASCADE);
+
+INSERT INTO users(username, password) VALUES ('djfsdfaef', 'awejgof1111');
+
+INSERT INTO settings(userID, difficulty, mode) VALUES (5, 'Easy', 0);

@@ -38,9 +38,9 @@ export default {
             if (data == null) {
                 return;
             }
+            console.log('adding alarm to db');
             axios.post(`${SERVER_URL}/addalarm/${this.userID}/`, {alarm: data})
             .then(response => {
-                console.log(response);
                 if (response.status == 200){
                     this.$emit("pushToList", data);
                     this.$emit("getAlarms");   

@@ -309,8 +309,6 @@ export default({
             this.graphToShow = clicked ? $event.target.value : this.graphToShow;
             var temp;
             var i
-            console.log("graph select changed", this.graphToShow);
-            console.log(this.weekGraphData);
             if (this.graphToShow == "snoozes") {
                 this.dataChart = this.weekGraphData.snoozes;
                 this.$set(this.options.scales, 'yAxes', this.numY);
