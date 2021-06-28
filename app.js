@@ -42,7 +42,9 @@ app.use(session({
     resave: false, // for every request to the server, dont create new session
     saveUninitialized: false,// if we have not modified the session, we dont want it to save
     cookie: {
+        secure: false,
         originalMaxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         expires: 30 * 24 * 60 * 60 * 1000
     },
     expires: new Date(Date.now() + (30 * 86400 * 1000)),
