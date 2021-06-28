@@ -67,7 +67,7 @@ app.get("/login", (req,res) => {
         req.session.isLoggedIn = true;
         req.session.save();
     }
-    console.log('User opened app:' + req.session.user);
+    console.log('Current User:' + req.session.user);
     res.send({id: req.session.user});
 })
 
