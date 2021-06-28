@@ -52,7 +52,8 @@
                 <div v-else>
                     <ion-row>
                         <ion-col v-for="(n,index) in 7" :key="index">
-                            <img v-if="weekGraphData.mood.length > index" :src="require(`@/assets/emojis/${emoticons[weekGraphData.mood[index]]}.svg`)" class="icon h5" :class="emoticons[weekGraphData.mood[index]]"/>
+                            <img v-if="weekGraphData.mood.length > index && weekGraphData.mood[index] != '-' " :src="require(`@/assets/emojis/${emoticons[weekGraphData.mood[index]]}.svg`)" class="icon h5" :class="emoticons[weekGraphData.mood[index]]"/>
+                            <p v-if="weekGraphData.mood[index] == '-'" class="regularText" style="text-align:center; padding:0; margin:0"> - </p>
                         </ion-col>
                     </ion-row>
                     <ion-row>
@@ -265,7 +266,7 @@ export default({
                 tempAnsTTW += moment(item.timeToWake, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
                 tempAnsWUT += moment(item.wakeUpTime, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds');
             }
-            this.aveSnoozes = this.allStatsLength ? tempAnsSnooze / this.allStatsLength : '-';
+            this.aveSnoozes = this.allStatsLength ? (tempAnsSnooze / this.allStatsLength).toFixed(2) : '-';
 
             tempAnsTTW = Math.floor(tempAnsTTW / this.allStatsLength);
             this.aveTime = this.allStatsLength ? (new Date(tempAnsTTW * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] : '-';
@@ -343,13 +344,19 @@ export default({
                 mood:[]
             };
             for (var item of this.weekStats) {
-                if (item.dayOfWeek - 1 <= this.weekGraphData.snoozes.length - 1) { //repeat value (multiple entries in one day)
+                if (item.dayOfWeek - 1 <= this.weekGraphData.snoozes.length - 1) { //normal entry or repeat value (multiple entries in one day)
                     this.$set(this.weekGraphData.snoozes,item.dayOfWeek-1, item.snoozes);
                     this.$set(this.weekGraphData.timeToWake,item.dayOfWeek-1, item.timeToWake);
                     this.$set(this.weekGraphData.wakeUpTime,item.dayOfWeek-1,item.wakeUpTime);
                     this.$set(this.weekGraphData.mood,item.dayOfWeek-1,item.mood);
                 }
-                else {
+                else if (item.dayOfWeek - 1 > this.weekGraphData.snoozes.length - 1) { //if no entry before (i.e. if Monday (2) is the first entry) 2 - 1 > 0; 1 > 0
+                    for (let i = 0; i <= (item.dayOfWeek - 1- this.weekGraphData.snoozes.length - 1); i++) {
+                        this.weekGraphData.snoozes.push('-');
+                        this.weekGraphData.timeToWake.push('-');
+                        this.weekGraphData.wakeUpTime.push('-');
+                        this.weekGraphData.mood.push('-');
+                    }
                     this.weekGraphData.snoozes.push(item.snoozes);
                     this.weekGraphData.timeToWake.push(item.timeToWake);
                     this.weekGraphData.wakeUpTime.push(item.wakeUpTime);
