@@ -5,20 +5,22 @@ const mysql = require('mysql');
 const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser');
 const session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
+const sqlite = require("better-sqlite3"); 
+const SqliteStore = require("better-sqlite3-session-store")(session);
+const sqLitedb = new sqlite("sessions.db", { verbose: console.log });
+
 const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE} = require('./config');
+
 var options = {
-	host: DB_HOST,
-	user: DB_USERNAME,
-	password: DB_PASSWORD,
-	database: DB_DATABASE,
-    expiration: 30 * 24 * 60 * 60 * 1000, //86400000,
-	createDatabaseTable: true,
-    clearExpired: true,
-	// How frequently expired sessions will be cleared; milliseconds:
-	checkExpirationInterval: 24 * 60 * 60 * 1000,
+    client: sqLitedb, 
+    expired: {
+        clear: true,
+        intervalMs: 30 * 24 * 60 * 60 * 1000 //ms = 15min
+    }
 };
 
+var sessionStore = new SqliteStore(options);
+  
 const db_config = {
     host: DB_HOST,
     user: DB_USERNAME,
@@ -28,9 +30,6 @@ const db_config = {
 };
 
 const db = mysql.createPool(db_config);
-
-var sessionStore = new MySQLStore(options);
-
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -11,6 +11,8 @@
   "dependencies": {
     "@ionic/vue": "0.0.4",
     "axios": "^0.21.1",
+    "better-sqlite3": "^7.4.1",
+    "better-sqlite3-session-store": "0.0.2",
     "chart.js": "^2.9.4",
     "core-js": "^2.6.5",
     "cors": "^2.8.5",
