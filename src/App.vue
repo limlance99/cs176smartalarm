@@ -252,7 +252,7 @@ export default {
       .then(response => {
         console.log(response);
         if (response.status == 200) {
-          alert('created new user with ID:', response.data.id);
+          // alert('created new user with ID:', response.data.id);
           this.userID = response.data.id;
           console.log(this.userID, response.data.id);
           this.getAlarms();
