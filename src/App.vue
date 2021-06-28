@@ -20,7 +20,7 @@
 
         <ion-tab tab="settings">
           <Header :header="'Settings'" :isMorning="isMorning" @getAlarms="getAlarms" :userID="userID"/>
-          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" :userID="userID"/>
+          <Settings :difficulty="currentDiff" v-on:changeDiff="changeDiff" :userID="userID" @getSettings="getSettings"/>
         </ion-tab>
 
         <ion-tab-bar slot="bottom" style="padding-top:5px; padding-bottom:5px" :color="[isMorning ? 'secondary' : 'primary']">
@@ -111,7 +111,7 @@ export default {
       ringtone: new Audio(Pigstep),
       deferredPrompt: null,
       allStats: [],
-      weekStats: []
+      weekStats: [],
     };
   },
   created() {
@@ -254,6 +254,8 @@ export default {
           this.userID = response.data.id;
           console.log(this.userID);
           this.getAlarms();
+          this.getStats();
+          this.getSettings();
         }
       });
     },
@@ -278,6 +280,16 @@ export default {
       });
       
       
+    },
+    getSettings() {
+      console.log("getting settings from db");
+      axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
+      .then(response => {
+        if (response.status == 200) {
+          console.log(response);
+          this.currentDiff = response.data[0].difficulty;
+        }
+      });
     },
     deleteUser(userID) {
       console.log("deleting user from db: ", userID);
