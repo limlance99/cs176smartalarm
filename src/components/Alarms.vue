@@ -48,9 +48,9 @@ export default {
                   role: 'destructive',
                   handler: () => {
                     this.$emit("deleteAlarm", key);
+                    console.log('deleting alarm from db');
                     axios.get(`${SERVER_URL}/deletealarm/${this.listOfAlarms[key].id}`)
                     .then(response => {
-                      console.log(response);
                       if (response.status == 200) {
                         //
                       }
@@ -62,7 +62,6 @@ export default {
                   text: 'Cancel',
                   role: 'cancel',
                   handler: () => {
-                    // console.log('Cancel clicked')
                   },
                 },
               ],
@@ -70,7 +69,6 @@ export default {
           await actionSheet.present();
 
           const { role } = await actionSheet.onDidDismiss();
-          // console.log('onDidDismiss resolved with role', role);
         },
     }
 }

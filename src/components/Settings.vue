@@ -47,7 +47,7 @@ export default {
       });
     },
     getSettings() {
-      console.log("getting settings");
+      console.log("getting settings from db");
       axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
       .then(response => {
         if (response.status == 200) {
