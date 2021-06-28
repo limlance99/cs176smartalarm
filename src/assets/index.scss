@@ -62,7 +62,7 @@ $light-background: linear-gradient(200deg, #90a6e4, #eeaccc);
   --ion-color-primary-tint: #22243F;
   /** secondary **/
   --ion-color-secondary: #5f71a3;
-  --ion-color-secondary-rgb: rgb(10, 12, 17);
+  --ion-color-secondary-rgb:95, 113, 163;
   --ion-color-secondary-contrast: #FFFEFF;
   --ion-color-secondary-contrast-rgb: 255, 254, 255;
   --ion-color-secondary-shade: #5f71a3;
@@ -233,7 +233,7 @@ ion-toolbar {
 }
 
 ion-tab-bar {
-  --background: #22243F;
+  --border: none !important;
 }
 
 /* Remove bottom border on md */
