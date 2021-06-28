@@ -8,6 +8,7 @@ const session = require('express-session');
 const sqlite = require("better-sqlite3"); 
 const SqliteStore = require("better-sqlite3-session-store")(session);
 const sqLitedb = new sqlite("sessions.db");
+const path = require('path');
 
 const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE} = require('./config');
 
@@ -44,6 +45,8 @@ app.use(session({
         originalMaxAge: 30 * 24 * 60 * 60 * 1000,
         expires: 30 * 24 * 60 * 60 * 1000
     },
+    expires: new Date(Date.now() + (30 * 86400 * 1000)),
+    maxAge: Date.now() + (30 * 86400 * 1000)
     
 }));
 
@@ -383,6 +386,10 @@ app.get('/deletealarms', (req, res) => {
         console.log(result);
     });
 })
+
+app.get('*', function (req,res) {
+    res.sendFile('index.html', { root: path.join(__dirname, './dist') });
+});
 
 app.listen(port, () => {
     console.log('Server started on port: '+ port);
