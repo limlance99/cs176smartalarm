@@ -112,6 +112,10 @@ export default {
       deferredPrompt: null,
       allStats: [],
       weekStats: [],
+<<<<<<< HEAD
+=======
+      rangToday : [],
+>>>>>>> d740cd8e04e1d3a46dcb261f9e0522773876d5ab
     };
   },
   created() {
@@ -182,9 +186,9 @@ export default {
                 // Wait for the user to respond to the prompt
                 this.deferredPrompt.userChoice.then((choiceResult) => {
                   if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
+                    // console.log('User accepted the install prompt');
                   } else {
-                    console.log('User dismissed the install prompt');
+                    // console.log('User dismissed the install prompt');
                   }
                 });
                 return true;
@@ -246,13 +250,13 @@ export default {
       });
     },
     createUser() {
-      console.log('Creating User');
+      // console.log('Creating User');
       axios.get(`${SERVER_URL}/adduser`)
       .then(response => {
         if (response.status == 200) {
           // alert('created new user with ID:', response.data.id);
           this.userID = response.data.id;
-          console.log(this.userID);
+          // console.log(this.userID);
           this.getAlarms();
           this.getStats();
           this.getSettings();
@@ -260,7 +264,7 @@ export default {
       });
     },
     getAlarms() {
-      console.log("fetching alarms from db");
+      // console.log("fetching alarms from db");
       axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
       .then(response => {
         this.listOfAlarms = response.data;
@@ -269,7 +273,7 @@ export default {
     },
 
     getStats() {
-      console.log("fetching stats from db");
+      // console.log("fetching stats from db");
       axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
       .then(response => {
         this.allStats = response.data;
@@ -292,7 +296,7 @@ export default {
       });
     },
     deleteUser(userID) {
-      console.log("deleting user from db: ", userID);
+      // console.log("deleting user from db: ", userID);
       axios.get(`${SERVER_URL}/deleteuser/${userID}`)
       .then(response => {
         this.userID = 5;
@@ -333,11 +337,13 @@ export default {
           item.time == time && item.ampm == amOrpm && activeDays.includes(day) :
           item.time == time && item.ampm == amOrpm;
 
-        if (willRing) {
+        if (willRing && !this.rangToday.includes(item.time)) {
           var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
           // this.$set(item, 'isActive', false);
           // this.$set(this.listOfAlarms, i, item);
-          this.toggleOne(i);
+          if (!hasSetDay) this.toggleOne(i);
+          else this.rangToday.push(item.time);
+          
           clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(toPass);
         }
@@ -563,7 +569,7 @@ export default {
                   wakeUpTime: wakeUpTime,
                   mood: mood
                 }
-                console.log("adding statistics to db");
+                // console.log("adding statistics to db");
                 axios.post(`${SERVER_URL}/addstat`, {statPost})
                 .then(response => {
                     // console.log(response);
