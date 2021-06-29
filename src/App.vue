@@ -184,7 +184,7 @@ export default {
     async showInstallAlert() {
       const alert = await this.$ionic.alertController
         .create({
-          message: `<p class="no-margin"> Install this PWA Now!!! </p>`,
+          message: `<p class="no-margin"> Install now for a more personalized experience. </p>`,
           mode: "ios",
           buttons: [
             {
@@ -203,7 +203,7 @@ export default {
               },
             },
           ],
-          backdropDismiss: false,
+          backdropDismiss: true,
         });
       await alert.present();
 
@@ -324,8 +324,10 @@ export default {
           message: "Loading data..."
         });
         loading.present();
+        // console.log(this.userID);
         axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
       .then(response => {
+        // console.log(response);
         if (response.status == 200) {
           this.currentDiff = response.data[0].difficulty;
           loading.dismiss();

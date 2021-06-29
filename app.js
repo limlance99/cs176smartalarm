@@ -146,11 +146,13 @@ app.get('/adduser', (req, res) => {
         if (err) {
             console.log(err);
         }
-        res.send({id: result.insertId});
+        // res.send({id: result.insertId});
         console.log('user added');
         req.session.user = result.insertId;
         req.session.isLoggedIn = true;
         req.session.save();
+
+        let newUserID = result.insertId;
         // res.cookie('id', result.insertId, { maxAge: 900000, httpOnly: true });
         // console.log(req.cookies);
         let sql2 = 'INSERT INTO settings SET ?'
@@ -161,6 +163,7 @@ app.get('/adduser', (req, res) => {
                 console.log(err);
             }
             console.log('settings for user added');
+            res.send({id: newUserID});
             // res.send('settings added');
             // console.log(result);
         })
