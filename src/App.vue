@@ -259,17 +259,25 @@ export default {
     },
     createUser() {
       // console.log('Creating User');
-      axios.get(`${SERVER_URL}/adduser`)
-      .then(response => {
-        if (response.status == 200) {
-          // alert('created new user with ID:', response.data.id);
-          this.userID = response.data.id;
-          // console.log(this.userID);
-          this.getAlarms();
-          this.getStats();
-          this.getSettings();
-        }
-      });
+      setTimeout(async () => {
+        const loading = await this.$ionic.loadingController.create({
+          message: "Loading data..."
+        });
+        loading.present();
+        axios.get(`${SERVER_URL}/adduser`)
+        .then(response => {
+          if (response.status == 200) {
+            // alert('created new user with ID:', response.data.id);
+            this.userID = response.data.id;
+            // console.log(this.userID);
+            loading.dismiss();
+            this.getAlarms();
+            this.getStats();
+            this.getSettings();
+          }
+        });
+        // this.loading.dismiss();
+      }, 0);
     },
     getAlarms() {
       // console.log("fetching alarms from db");
