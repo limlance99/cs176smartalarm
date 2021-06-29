@@ -325,7 +325,7 @@ export default {
           var toPass = {time : item.time, ampm : item.ampm, origDateTime : new Date(), snoozes: 0};
           // this.$set(item, 'isActive', false);
           // this.$set(this.listOfAlarms, i, item);
-          this.toggleOne(i);
+          if (!hasSetDay) this.toggleOne(i);
           clearInterval(this.intervalcheckAlarms);
           this.toggleAlarm(toPass);
         }
