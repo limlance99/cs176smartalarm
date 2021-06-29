@@ -344,14 +344,18 @@ export default({
                 mood:[]
             };
             for (var item of this.weekStats) {
-                if (item.dayOfWeek - 1 <= this.weekGraphData.snoozes.length - 1) { //normal entry or repeat value (multiple entries in one day)
+                if (item.dayOfWeek - 1 <= this.weekGraphData.snoozes.length) { //normal entry or repeat value (multiple entries in one day)
+                    // console.log('repeat/normal entry');
                     this.$set(this.weekGraphData.snoozes,item.dayOfWeek-1, item.snoozes);
                     this.$set(this.weekGraphData.timeToWake,item.dayOfWeek-1, item.timeToWake);
                     this.$set(this.weekGraphData.wakeUpTime,item.dayOfWeek-1,item.wakeUpTime);
                     this.$set(this.weekGraphData.mood,item.dayOfWeek-1,item.mood);
                 }
-                else if (item.dayOfWeek - 1 > this.weekGraphData.snoozes.length - 1) { //if no entry before (i.e. if Monday (2) is the first entry) 2 - 1 > 0; 1 > 0
-                    for (let i = 0; i <= (item.dayOfWeek - 1- this.weekGraphData.snoozes.length - 1); i++) {
+                else if (item.dayOfWeek - 1 > this.weekGraphData.snoozes.length) { //if no entry before (i.e. if Monday (2) is the first entry) 2 - 1 > 0; 1 > 0
+                    // console.log('skip entry', item.dayOfWeek - this.weekGraphData.snoozes.length - 2);
+                    let lastIndex = this.weekGraphData.snoozes.length;
+                    // console.log('skip entry', item.dayOfWeek - 1 - lastIndex);
+                    for (let i = 0; i < (item.dayOfWeek - 1 - lastIndex); i++) {
                         this.weekGraphData.snoozes.push('-');
                         this.weekGraphData.timeToWake.push('-');
                         this.weekGraphData.wakeUpTime.push('-');
