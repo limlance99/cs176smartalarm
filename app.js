@@ -5,22 +5,23 @@ const mysql = require('mysql');
 const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const sqlite = require("better-sqlite3"); 
-const SqliteStore = require("better-sqlite3-session-store")(session);
-const sqLitedb = new sqlite("sessions.db");
 const path = require('path');
+const pg = require('pg');
+const pgSession = require('connect-pg-simple')(session);
 
-const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE} = require('./config');
+const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE, PG_URL} = require('./config');
 
-var options = {
-    client: sqLitedb, 
-    expired: {
-        clear: true,
-        intervalMs: 24 * 60 * 60 * 1000 //ms = 15min
-    }
-};
+var pgPool = new pg.Pool({
+    connectionString: PG_URL,
+    ssl: {
+        rejectUnauthorized: false
+    },
+})
 
-var sessionStore = new SqliteStore(options);
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
   
 const db_config = {
     host: DB_HOST,
@@ -32,13 +33,9 @@ const db_config = {
 
 const db = mysql.createPool(db_config);
 
-const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
 app.use(session({
     secret: 'jodsnfjan2934jdasd1', //key that will sign cookie,
-    store: sessionStore,
+    store: new pgSession({ pool: pgPool }),
     resave: false, // for every request to the server, dont create new session
     saveUninitialized: false,// if we have not modified the session, we dont want it to save
     cookie: {
