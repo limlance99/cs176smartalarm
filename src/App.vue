@@ -324,10 +324,10 @@ export default {
           message: "Loading data..."
         });
         loading.present();
-        console.log(this.userID);
+        // console.log(this.userID);
         axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
       .then(response => {
-        console.log(response);
+        // console.log(response);
         if (response.status == 200) {
           this.currentDiff = response.data[0].difficulty;
           loading.dismiss();
