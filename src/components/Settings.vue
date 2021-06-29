@@ -31,7 +31,7 @@ export default {
   },
   created() {
     // this.getSettings();
-    this.$emit('getSettings');
+    // this.$emit('getSettings');
   },
   methods: {
     changeDiff($event) {
