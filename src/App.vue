@@ -102,8 +102,8 @@ export default {
       difficulties: ["Easy", "Medium", "Hard"],
       currentDiff: "Easy",
       listOfAlarms: [
-        { time: "02:07", ampm: "AM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true},] },
-        { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: false}, {day: 'T', isActive: true}, {day: 'W', isActive: false},] },
+        // { time: "02:07", ampm: "AM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: true}, {day: 'T', isActive: true}, {day: 'W', isActive: true},] },
+        // { time: "06:08", ampm: "PM", isActive: true, repetitions: [{day: 'Su', isActive: false}, {day: 'M', isActive: false}, {day: 'T', isActive: true}, {day: 'W', isActive: false},] },
       ],
       hiddenAlarms: [],
       intervalcheckTime: null,
@@ -117,16 +117,27 @@ export default {
   },
   created() {
     this.updateTime();
-    
     // get user id from session
-    axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
-    .then(response => {
-      // console.log("user current logged in: ",response.data);
-      this.userID = response.data.id != null ? response.data.id : 5;
-      // console.log("current user: ", this.userID);
-      this.getAlarms();
-      this.getStats();
-    });
+    // this.loading.present();
+    setTimeout(async () => {
+        const loading = await this.$ionic.loadingController.create({
+          message: "Loading data..."
+        });
+        loading.present();
+        axios.get(`${SERVER_URL}/login`,{ withCredentials: true })
+        .then(response => {
+          // console.log("user current logged in: ",response.data);
+          // this.loading.dismiss();
+          this.userID = response.data.id != null ? response.data.id : 5;
+          // console.log("current user: ", this.userID);
+          this.getAlarms();
+          this.getStats();
+          this.getSettings();
+          loading.dismiss();
+        });
+      // this.loading.dismiss();
+    }, 0);
+    
 
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -262,35 +273,59 @@ export default {
     },
     getAlarms() {
       // console.log("fetching alarms from db");
-      axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
-      .then(response => {
-        this.listOfAlarms = response.data;
-        // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
-      });
+      setTimeout(async () => {
+        const loading = await this.$ionic.loadingController.create({
+          message: "Loading data..."
+        });
+        loading.present();
+        axios.get(`${SERVER_URL}/getalarms/${this.userID}`)
+        .then(response => {
+          loading.dismiss();
+          this.listOfAlarms = response.data;
+          // this.listOfAlarms.forEach((item) => JSON.parse(item.repetitions));
+        });
+      // this.loading.dismiss();
+      }, 0);
+      
     },
 
     getStats() {
+      setTimeout(async () => {
+        const loading = await this.$ionic.loadingController.create({
+          message: "Loading data..."
+        });
+        loading.present();
+        axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
+        .then(response => {
+          this.allStats = response.data;
+        });
+        axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
+        .then(response => {
+          this.weekStats = response.data;
+          loading.dismiss();
+        });
+      // this.loading.dismiss();
+      }, 0);
       // console.log("fetching stats from db");
-      axios.get(`${SERVER_URL}/getallstat/${this.userID}`)
-      .then(response => {
-        this.allStats = response.data;
-      });
-      axios.get(`${SERVER_URL}/getweekstat/${this.userID}`)
-      .then(response => {
-        this.weekStats = response.data;
-      });
       
       
     },
     getSettings() {
-      // console.log("getting settings from db");
-      axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
+      setTimeout(async () => {
+        const loading = await this.$ionic.loadingController.create({
+          message: "Loading data..."
+        });
+        loading.present();
+        axios.get(`${SERVER_URL}/getsetting/${this.userID}`)
       .then(response => {
         if (response.status == 200) {
-          // console.log(response);
           this.currentDiff = response.data[0].difficulty;
+          loading.dismiss();
         }
       });
+      // this.loading.dismiss();
+      }, 0);
+      // console.log("getting settings from db");
     },
     deleteUser(userID) {
       // console.log("deleting user from db: ", userID);
