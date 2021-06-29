@@ -77,68 +77,68 @@ app.get("/login", (req,res) => {
 })
 
 //CREATE DATABASE*************************************************************************************/
-app.get('/createdb', (req, res) => {
-    let query = 'CREATE DATABASE smartalarm';
-    db.query(query, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        res.send('database created');
-        // console.log(result);
-    });
-})
+// app.get('/createdb', (req, res) => {
+//     let query = 'CREATE DATABASE smartalarm';
+//     db.query(query, (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send('database created');
+//         // console.log(result);
+//     });
+// })
 
 //CREATE TABLES*************************************************************************************/
-app.get('/createusers', (req, res) => {
-    let query = 'DROP TABLE IF EXISTS users CASCADE; '
-    query += 'CREATE TABLE users(id int AUTO_INCREMENT, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY (id))';
-    db.query(query, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        res.send('users table created');
-        // console.log(result);
-    });
-});
+// app.get('/createusers', (req, res) => {
+//     let query = 'DROP TABLE IF EXISTS users CASCADE; '
+//     query += 'CREATE TABLE users(id int AUTO_INCREMENT, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY (id))';
+//     db.query(query, (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send('users table created');
+//         // console.log(result);
+//     });
+// });
 
-app.get('/createalarms', (req, res) => {
-    let query = 'DROP TABLE IF EXISTS alarms; '
-    query += 'CREATE TABLE alarms(id int AUTO_INCREMENT, userID int, time VARCHAR(255), isActive BOOL, repetitions VARCHAR(255), ampm VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
-    db.query(query, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        res.send('alarms table created');
-        // console.log(result);
-    });
-});
+// app.get('/createalarms', (req, res) => {
+//     let query = 'DROP TABLE IF EXISTS alarms; '
+//     query += 'CREATE TABLE alarms(id int AUTO_INCREMENT, userID int, time VARCHAR(255), isActive BOOL, repetitions VARCHAR(255), ampm VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+//     db.query(query, (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send('alarms table created');
+//         // console.log(result);
+//     });
+// });
 
-app.get('/createsettings', (req, res) => {
-    //difficulty: 0- easy; 1- medium; 2-difficult
-    //mode: 0-light; 1-dark
-    let query = 'DROP TABLE IF EXISTS settings; '
-    query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty VARCHAR(255), mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
-    db.query(query, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        res.send('settings table created');
-        // console.log(result);
-    })
-})
+// app.get('/createsettings', (req, res) => {
+//     //difficulty: 0- easy; 1- medium; 2-difficult
+//     //mode: 0-light; 1-dark
+//     let query = 'DROP TABLE IF EXISTS settings; '
+//     query += 'CREATE TABLE settings(id int AUTO_INCREMENT,  userID int, difficulty VARCHAR(255), mode int, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+//     db.query(query, (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send('settings table created');
+//         // console.log(result);
+//     })
+// })
 
-app.get('/createstatistics', (req, res) => {
-    //dateTime contains date and wake up time
-    let query = 'DROP TABLE IF EXISTS statistics; '
-    query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), mood int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
-    db.query(query, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        res.send('statistics table created');
-        // console.log(result);
-    })
-})
+// app.get('/createstatistics', (req, res) => {
+//     //dateTime contains date and wake up time
+//     let query = 'DROP TABLE IF EXISTS statistics; '
+//     query += 'CREATE TABLE statistics(id int AUTO_INCREMENT,  userID int, snoozes int, timeToWake VARCHAR(255), wakeUpTime VARCHAR(255), mood int, dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE)'
+//     db.query(query, (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send('statistics table created');
+//         // console.log(result);
+//     })
+// })
 
 //INSERTING IN THE TABLES*************************************************************************************/
 app.get('/adduser', (req, res) => {
