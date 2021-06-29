@@ -13,7 +13,9 @@ const {DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE, PG_URL} = require('./conf
 
 var pgPool = new pg.Pool({
     connectionString: PG_URL,
-    ssl: true,
+    ssl: {
+        rejectUnauthorized: false
+    },
 })
 
 const app = express();
