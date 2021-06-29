@@ -47,7 +47,7 @@ export default {
                   text: 'Delete',
                   role: 'destructive',
                   handler: () => {
-                    console.log('deleting alarm from db');
+                    // console.log('deleting alarm from db');
                     axios.get(`${SERVER_URL}/deletealarm/${this.listOfAlarms[key].id}`)
                     .then(response => {
                       if (response.status == 200) {

@@ -367,12 +367,12 @@ export default({
     },
     watch: {
         allStats() {
-            console.log("stats updated, getting new average");
+            // console.log("stats updated, getting new average");
             this.getAverageNumber();
             // this.todayWake = moment(this.allStats[this.allStatsLength-1].wakeUpTime, 'HH:mm:ss').format('hh:mm A');
         },
         async weekStats() {
-            console.log("week stats updated, getting new average");
+            // console.log("week stats updated, getting new average");
             let res = await this.formatWeekData();
             this.onChange('dummy', false);
             // this.onChange('dummy', false);
